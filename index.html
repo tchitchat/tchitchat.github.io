@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TchitChat</title>
+    <style>
+        /* Reset et base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Google Sans', Arial, sans-serif;
+            background-color: #f0f4f9;
+            color: #1f1f1f;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Barre latérale */
+        .sidebar {
+            width: 280px;
+            background-color: #f0f4f8;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            justify-content: space-between;
+        }
+
+        .menu-btn {
+            font-size: 24px;
+            padding: 10px;
+            cursor: pointer;
+            width: fit-content;
+            border-radius: 50%;
+        }
+
+        .menu-btn:hover {
+            background-color: #e2e7ed;
+        }
+
+        .new-chat-btn {
+            margin-top: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background-color: #e6eaf1;
+            border: none;
+            border-radius: 50px;
+            color: #444746;
+            font-weight: 500;
+            cursor: pointer;
+            width: fit-content;
+        }
+
+        /* Conteneur principal */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        /* Header avec le dégradé style Gemini */
+        .header {
+            margin-top: 10vh;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .header h1 {
+            font-size: 56px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .greeting {
+            background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 56px;
+            color: #c4c7c5;
+            font-weight: 500;
+        }
+
+        /* Grille de suggestions */
+        .suggestions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 50px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            min-height: 140px;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.2s;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .card:hover {
+            background-color: #e9eef6;
+        }
+
+        .card-icon {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: #f0f4f9;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        /* Zone de saisie en bas */
+        .bottom-container {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input-box {
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            padding: 10px 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .input-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 12px 0;
+            font-size: 16px;
+            background: transparent;
+        }
+
+        .input-icons {
+            display: flex;
+            gap: 20px;
+            color: #444746;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .disclaimer {
+            font-size: 12px;
+            color: #5f6368;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div>
+            <div class="menu-btn">☰</div>
+            <button class="new-chat-btn">
+                <span>+</span> Nouveau chat
+            </button>
+        </div>
+        <div class="sidebar-footer">
+            </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h1><span class="greeting">Bonjour, l'ami</span></h1>
+            <h1 class="subtitle">Comment puis-je vous aider ?</h1>
+        </header>
+
+        <section class="suggestions">
+            <div class="card">
+                Explique-moi comment fonctionne une API
+                <div class="card-icon">💡</div>
+            </div>
+            <div class="card">
+                Donne-moi des idées de snacks sains
+                <div class="card-icon">🍎</div>
+            </div>
+            <div class="card">
+                Aide-moi à écrire un poème sur la pluie
+                <div class="card-icon">✍️</div>
+            </div>
+            <div class="card">
+                Quelles sont les meilleures extensions VS Code ?
+                <div class="card-icon">💻</div>
+            </div>
+        </section>
+
+        <div class="bottom-container">
+            <div class="input-box">
+                <input type="text" placeholder="Entrez une invite ici">
+                <div class="input-icons">
+                    <span>🖼️</span>
+                    <span>🎤</span>
+                    <span style="color: #4285f4;">➤</span>
+                </div>
+            </div>
+            <p class="disclaimer">
+                Gemini peut afficher des informations inexactes, y compris sur des personnes. Vérifiez ses réponses.
+            </p>
+        </div>
+    </main>
+
+</body>
+</html>
