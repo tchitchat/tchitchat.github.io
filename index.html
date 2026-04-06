@@ -81,26 +81,27 @@
             margin-bottom: 10px;
         }
 
-        /* --- SECTION BAS DU MENU (AUTH & SETTINGS) --- */
+        /* --- SECTION BAS DU MENU --- */
         .sidebar-footer {
-            margin-top: auto; /* Pousse tout en bas */
+            margin-top: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             padding-top: 20px;
             border-top: 1px solid #dce1e7;
         }
 
         .btn-auth {
             width: 100%;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             border: 1px solid #4285f4;
             background: transparent;
             color: #4285f4;
             font-weight: 600;
             cursor: pointer;
             font-size: 14px;
+            transition: 0.2s;
         }
 
         .btn-signup {
@@ -110,19 +111,20 @@
 
         .btn-settings {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background: transparent;
             border: none;
             text-align: left;
             cursor: pointer;
             color: #1f1f1f;
-            font-size: 14px;
+            font-size: 15px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            border-radius: 10px;
         }
 
-        .btn-settings:hover { background: #e2e7ed; border-radius: 8px; }
+        .btn-settings:hover { background: #e2e7ed; }
 
         /* --- MAIN CONTENT --- */
         .main-content {
@@ -135,7 +137,6 @@
         }
 
         header { padding: 10px 15px; display: flex; align-items: center; }
-
         .menu-toggle { width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .menu-toggle img { width: 24px; }
 
@@ -179,13 +180,13 @@
             flex-shrink: 0;
         }
 
-        /* --- BARRE DE CHAT ENCORE PLUS HAUTE --- */
+        /* --- BARRE DE CHAT ENCORE PLUS HAUTE (100px) --- */
         .bottom-container {
             flex-shrink: 0;
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
-            padding: 10px 15px 70px 15px; /* Passé de 45px à 70px */
+            padding: 10px 15px 100px 15px; /* Augmenté à 100px */
             background-color: #f8fbff;
         }
 
@@ -236,7 +237,7 @@
         <button class="btn-new-chat" onclick="location.reload()">+ Nouveau chat</button>
 
         <div class="conv-title">Conversations</div>
-        <p style="font-size: 13px; color: #70757a; padding-left: 5px;">Aucune discussion récente</p>
+        <p id="noConvText" style="font-size: 13px; color: #70757a; padding-left: 5px;">Aucune discussion récente</p>
 
         <div class="sidebar-footer" id="sidebarFooter">
             </div>
@@ -276,23 +277,26 @@
         const userInput = document.getElementById('userInput');
         const footer = document.getElementById('sidebarFooter');
 
-        // Simulation de l'état de connexion (change sur 'true' pour voir les paramètres)
+        // État de connexion
         let isConnected = false;
 
         function updateMenu() {
             if (isConnected) {
+                // SI CONNECTÉ : Uniquement Paramètres (et un bouton de test déconnexion)
                 footer.innerHTML = `
                     <button class="btn-settings">⚙️ Paramètres</button>
-                    <button class="btn-settings" onclick="isConnected=false; updateMenu()">Déconnexion</button>
+                    <button class="btn-settings" style="color:#d96570;" onclick="isConnected=false; updateMenu()">Déconnexion (Test)</button>
                 `;
             } else {
+                // SI NON CONNECTÉ : Se connecter et Créer un compte
                 footer.innerHTML = `
                     <button class="btn-auth" onclick="isConnected=true; updateMenu()">Se connecter</button>
                     <button class="btn-auth btn-signup">Créer un compte</button>
-                    <button class="btn-settings" style="margin-top:5px;">⚙️ Paramètres</button>
                 `;
             }
         }
+        
+        // Initialisation
         updateMenu();
 
         menuBtn.addEventListener('click', () => {
