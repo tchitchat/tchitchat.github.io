@@ -2,9 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TchitChat</title>
-    
     <link rel="icon" type="image/x-icon" href="tchitchat.ico">
     
     <style>
@@ -20,7 +19,8 @@
             color: #1f1f1f;
             display: flex;
             height: 100vh;
-            overflow: hidden;
+            /* Empêche le rebond du scroll sur tout le corps */
+            overflow: hidden; 
         }
 
         /* --- SIDEBAR --- */
@@ -41,42 +41,52 @@
             left: 0;
         }
 
-        .brand-name {
-            font-size: 22px;
-            font-weight: bold;
-            color: #4285f4;
-            margin-bottom: 30px;
-        }
-
         /* --- MAIN CONTENT --- */
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
+            height: 100vh; /* Force la hauteur de l'écran */
             width: 100%;
             position: relative;
         }
 
         header {
-            padding: 15px;
+            padding: 10px 15px;
             display: flex;
             align-items: center;
+            flex-shrink: 0; /* Empêche le header de s'écraser */
         }
 
+        /* Bouton Menu avec image */
         .menu-toggle {
-            font-size: 24px;
+            width: 40px;
+            height: 40px;
             cursor: pointer;
-            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
+        .menu-toggle img {
+            width: 24px; /* Taille standard icône */
+            height: auto;
+        }
+
+        /* ZONE SCROLLABLE (Le contenu du milieu) */
         .chat-area {
             flex: 1;
+            overflow-y: auto; /* Seule cette partie scrolle */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             padding: 20px;
-            text-align: center;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .hero-text {
+            margin-top: auto;
+            margin-bottom: 20px;
         }
 
         .hero-text h1 {
@@ -90,19 +100,17 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .subtitle {
-            color: #c4c7c5;
-        }
+        .subtitle { color: #c4c7c5; }
 
-        /* --- SUGGESTIONS --- */
+        /* SUGGESTIONS */
         .suggestions {
             display: flex;
             gap: 12px;
             width: 100%;
             max-width: 800px;
-            margin-top: 30px;
+            margin-bottom: auto;
             overflow-x: auto;
-            padding: 10px;
+            padding: 10px 0;
             scrollbar-width: none;
         }
 
@@ -118,12 +126,14 @@
             flex-shrink: 0;
         }
 
-        /* --- INPUT AREA --- */
+        /* --- BARRE DE CHAT FIXÉE --- */
         .bottom-container {
+            flex-shrink: 0; /* Ne bouge jamais */
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
-            padding: 10px 15px 30px 15px;
+            padding: 10px 15px 20px 15px;
+            background-color: #f8fbff; /* Même couleur que le fond */
         }
 
         .input-box {
@@ -131,8 +141,9 @@
             border-radius: 28px;
             display: flex;
             align-items: center;
-            padding: 5px 15px 5px 25px; /* Ajusté pour l'image */
+            padding: 5px 15px 5px 25px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid #e1e4e8;
         }
 
         .input-box input {
@@ -141,14 +152,13 @@
             outline: none;
             font-size: 16px;
             padding: 12px 0;
+            background: transparent;
         }
 
-        /* Bouton envoyer avec image */
         .send-btn {
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             cursor: pointer;
-            transition: transform 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -157,11 +167,6 @@
         .send-btn img {
             width: 100%;
             height: auto;
-            object-fit: contain;
-        }
-
-        .send-btn:active {
-            transform: scale(0.85);
         }
 
         .disclaimer {
@@ -187,13 +192,15 @@
     <div class="overlay" id="overlay"></div>
 
     <aside class="sidebar" id="sidebar">
-        <div class="brand-name">TchitChat</div>
+        <div style="font-size: 22px; font-weight: bold; color: #4285f4; margin-bottom: 30px;">TchitChat</div>
         <p style="font-size: 14px; color: #5f6368;">Historique vide</p>
     </aside>
 
     <main class="main-content">
         <header>
-            <div class="menu-toggle" id="menuBtn">☰</div>
+            <div class="menu-toggle" id="menuBtn">
+                <img src="menu.png" alt="Menu">
+            </div>
         </header>
 
         <div class="chat-area">
@@ -203,15 +210,16 @@
             </div>
 
             <section class="suggestions">
-                <div class="card" onclick="fillInput('Rédige une blague courte')">Blague courte 🎭</div>
-                <div class="card" onclick="fillInput('Idée de cadeau')">Idée de cadeau 🎁</div>
-                <div class="card" onclick="fillInput('Recette simple')">Recette simple 🍝</div>
+                <div class="card" onclick="fillInput('Rédige une blague')">Blague 🎭</div>
+                <div class="card" onclick="fillInput('Idée de cadeau')">Cadeau 🎁</div>
+                <div class="card" onclick="fillInput('Recette simple')">Recette 🍝</div>
+                <div class="card" onclick="fillInput('Code-moi un jeu')">Code 💻</div>
             </section>
         </div>
 
         <div class="bottom-container">
             <div class="input-box">
-                <input type="text" id="userInput" placeholder="Demandez-moi n'importe quoi...">
+                <input type="text" id="userInput" placeholder="Ecrivez à TchitChat...">
                 <div class="send-btn" id="sendBtn">
                     <img src="send.png" alt="Envoyer">
                 </div>
@@ -228,8 +236,8 @@
         const userInput = document.getElementById('userInput');
 
         menuBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
         });
 
         overlay.addEventListener('click', () => {
@@ -250,9 +258,7 @@
         });
 
         userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendBtn.click();
-            }
+            if (e.key === 'Enter') sendBtn.click();
         });
     </script>
 </body>
