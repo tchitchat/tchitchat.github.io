@@ -7,200 +7,58 @@
     <link rel="icon" type="image/x-icon" href="tchitchat.ico">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background-color: #f8fbff;
-            color: #1f1f1f;
-            display: flex;
-            height: 100dvh; 
-            overflow: hidden; 
-        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fbff; display: flex; height: 100dvh; overflow: hidden; }
 
-        /* --- SIDEBAR --- */
-        .sidebar {
-            position: fixed;
-            left: -280px;
-            top: 0;
-            width: 280px;
-            height: 100%;
-            background-color: #f0f4f9;
-            z-index: 1000;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 20px;
-            border-right: 1px solid #dce1e7;
-            display: flex;
-            flex-direction: column;
-        }
+        .sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background-color: #f0f4f9; z-index: 1000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; border-right: 1px solid #dce1e7; display: flex; flex-direction: column; }
         .sidebar.active { left: 0; }
         .sidebar-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .sidebar-logo { width: 30px; height: auto; }
-        .sidebar-brand {
-            font-size: 20px;
-            font-weight: bold;
-            background: linear-gradient(90deg, #4285f4, #9b72cb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .btn-new-chat {
-            background-color: #4285f4;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 12px;
-            font-weight: 600;
-            width: 100%;
-            text-align: left;
-            margin-bottom: 25px;
-            cursor: pointer;
-        }
+        .sidebar-logo { width: 30px; }
+        .sidebar-brand { font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .btn-new-chat { background-color: #4285f4; color: white; border: none; border-radius: 12px; padding: 12px; font-weight: 600; width: 100%; text-align: left; margin-bottom: 25px; cursor: pointer; }
 
-        /* --- AUTH BUTTONS IN SIDEBAR --- */
-        .sidebar-footer {
-            margin-top: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding-top: 20px;
-            border-top: 1px solid #dce1e7;
-        }
-        .btn-auth {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #4285f4;
-            background: transparent;
-            color: #4285f4;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            font-size: 14px;
-        }
+        .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 20px; border-top: 1px solid #dce1e7; }
+        .btn-auth { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #4285f4; background: transparent; color: #4285f4; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; font-size: 14px; }
         .btn-signup { background-color: #4285f4; color: white; }
-        .btn-settings {
-            width: 100%;
-            padding: 12px;
-            background: transparent;
-            border: none;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-radius: 10px;
-            cursor: pointer;
-        }
+        .btn-settings { width: 100%; padding: 12px; background: transparent; border: none; text-align: left; display: flex; align-items: center; gap: 12px; border-radius: 10px; cursor: pointer; }
 
-        /* --- MAIN CONTENT --- */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
-            position: relative;
-            justify-content: space-between;
-        }
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100%; width: 100%; position: relative; justify-content: space-between; }
         header { padding: 10px 15px; flex-shrink: 0; }
         .menu-toggle { width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; }
         .menu-toggle img { width: 24px; }
 
-        .chat-area {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px 20px;
-            justify-content: center;
-        }
+        .chat-area { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 10px 20px; justify-content: center; }
         .hero-text h1 { font-size: clamp(28px, 7vw, 48px); line-height: 1.2; text-align: center;}
-        .gradient-text {
-            background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .gradient-text { background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .subtitle { color: #c4c7c5; text-align: center; }
 
-        .suggestions {
-            display: flex;
-            gap: 12px;
-            width: 100%;
-            max-width: 800px;
-            margin-top: 20px;
-            overflow-x: auto;
-            padding: 10px 5px;
-            scrollbar-width: none;
-        }
-        .card {
-            min-width: 150px;
-            background: white;
-            padding: 15px;
-            border-radius: 16px;
-            font-size: 13px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            flex-shrink: 0;
-            cursor: pointer;
-        }
+        .suggestions { display: flex; gap: 12px; width: 100%; max-width: 800px; margin-top: 20px; overflow-x: auto; padding: 10px 5px; scrollbar-width: none; }
+        .card { min-width: 150px; background: white; padding: 15px; border-radius: 16px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); flex-shrink: 0; cursor: pointer; }
 
-        /* --- INPUT BAR --- */
-        .bottom-container {
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 10px 15px 20px 15px;
-            background-color: #f8fbff;
-            flex-shrink: 0;
-        }
-        .input-box {
-            background: white;
-            border-radius: 28px;
-            display: flex;
-            align-items: center;
-            padding: 5px 10px 5px 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            border: 1px solid #e1e4e8;
-        }
-        .input-box input {
-            flex: 1;
-            border: none;
-            outline: none;
-            font-size: 16px;
-            padding: 12px 0;
-            background: transparent;
-        }
+        /* BARRE REMONTÉE */
+        .bottom-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px 15px 120px 15px; background-color: #f8fbff; flex-shrink: 0; }
+        .input-box { background: white; border-radius: 28px; display: flex; align-items: center; padding: 5px 10px 5px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e1e4e8; }
+        .input-box input { flex: 1; border: none; outline: none; font-size: 16px; padding: 12px 0; background: transparent; }
         .send-btn { width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .send-btn img { width: 100%; }
         .disclaimer { font-size: 10px; color: #70757a; margin-top: 8px; text-align: center; }
 
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.3);
-            z-index: 999;
-        }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 999; }
         .overlay.active { display: block; }
     </style>
 </head>
 <body>
-
     <div class="overlay" id="overlay"></div>
-
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <img src="logo.png" alt="Logo" class="sidebar-logo">
             <span class="sidebar-brand">TchitChat</span>
         </div>
         <button class="btn-new-chat" onclick="location.reload()">+ Nouveau chat</button>
-        <div class="sidebar-footer" id="sidebarFooter">
-            </div>
+        <div class="sidebar-footer" id="sidebarFooter"></div>
     </aside>
 
     <main class="main-content">
-        <header>
-            <div class="menu-toggle" id="menuBtn"><img src="menu.png" alt="Menu"></div>
-        </header>
-
+        <header><div class="menu-toggle" id="menuBtn"><img src="menu.png" alt="Menu"></div></header>
         <div class="chat-area">
             <div class="hero-text">
                 <h1><span class="gradient-text">Bienvenue</span></h1>
@@ -212,7 +70,6 @@
                 <div class="card" onclick="fillInput('Recette simple')">Recette 🍝</div>
             </section>
         </div>
-
         <div class="bottom-container">
             <div class="input-box">
                 <input type="text" id="userInput" placeholder="Ecrivez à TchitChat...">
@@ -238,41 +95,25 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // UI Elements
-        const sidebar = document.getElementById('sidebar');
-        const menuBtn = document.getElementById('menuBtn');
-        const overlay = document.getElementById('overlay');
-        const footer = document.getElementById('sidebarFooter');
-        const userInput = document.getElementById('userInput');
+        const sidebar = document.getElementById('sidebar'), menuBtn = document.getElementById('menuBtn'), 
+              overlay = document.getElementById('overlay'), footer = document.getElementById('sidebarFooter'), 
+              userInput = document.getElementById('userInput');
 
-        // Authentication State
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                footer.innerHTML = `
-                    <button class="btn-settings">⚙️ Paramètres</button>
-                    <button class="btn-settings" style="color:#d96570;" id="logoutBtn">Déconnexion</button>
-                `;
+                footer.innerHTML = `<button class="btn-settings">⚙️ Paramètres</button><button class="btn-settings" style="color:#d96570;" id="logoutBtn">Déconnexion</button>`;
                 document.getElementById('logoutBtn').onclick = () => signOut(auth);
             } else {
-                footer.innerHTML = `
-                    <a href="login/" class="btn-auth">Se connecter</a>
-                    <a href="signup/" class="btn-auth btn-signup">Créer un compte</a>
-                `;
+                footer.innerHTML = `<a href="login/" class="btn-auth">Se connecter</a><a href="signup/" class="btn-auth btn-signup">Créer un compte</a>`;
             }
         });
 
-        // Menu Toggle
         menuBtn.onclick = () => { sidebar.classList.add('active'); overlay.classList.add('active'); };
         overlay.onclick = () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); };
-
-        // Helper functions
         window.fillInput = (text) => { userInput.value = text; userInput.focus(); };
 
-        // Keyboard / Viewport Fix
         if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', () => {
-                document.body.style.height = window.visualViewport.height + 'px';
-            });
+            window.visualViewport.addEventListener('resize', () => { document.body.style.height = window.visualViewport.height + 'px'; });
         }
     </script>
 </body>
