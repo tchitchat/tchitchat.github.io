@@ -5,15 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>TchitChat</title>
     <link rel="icon" type="image/x-icon" href="tchitchat.ico">
-    
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Utilisation de dvh (dynamic viewport height) pour s'adapter au clavier */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', Roboto, sans-serif;
             background-color: #f8fbff;
@@ -38,9 +31,7 @@
             display: flex;
             flex-direction: column;
         }
-
         .sidebar.active { left: 0; }
-
         .sidebar-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
         .sidebar-logo { width: 30px; height: auto; }
         .sidebar-brand {
@@ -50,7 +41,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .btn-new-chat {
             background-color: #4285f4;
             color: white;
@@ -61,8 +51,10 @@
             width: 100%;
             text-align: left;
             margin-bottom: 25px;
+            cursor: pointer;
         }
 
+        /* --- AUTH BUTTONS IN SIDEBAR --- */
         .sidebar-footer {
             margin-top: auto;
             display: flex;
@@ -71,7 +63,6 @@
             padding-top: 20px;
             border-top: 1px solid #dce1e7;
         }
-
         .btn-auth {
             width: 100%;
             padding: 12px;
@@ -80,10 +71,12 @@
             background: transparent;
             color: #4285f4;
             font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
         }
-
         .btn-signup { background-color: #4285f4; color: white; }
-
         .btn-settings {
             width: 100%;
             padding: 12px;
@@ -94,6 +87,7 @@
             align-items: center;
             gap: 12px;
             border-radius: 10px;
+            cursor: pointer;
         }
 
         /* --- MAIN CONTENT --- */
@@ -104,14 +98,12 @@
             height: 100%;
             width: 100%;
             position: relative;
-            justify-content: space-between; /* Force la barre en bas et le contenu en haut */
+            justify-content: space-between;
         }
-
         header { padding: 10px 15px; flex-shrink: 0; }
         .menu-toggle { width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; }
         .menu-toggle img { width: 24px; }
 
-        /* Zone du milieu qui prend tout l'espace restant */
         .chat-area {
             flex: 1;
             overflow-y: auto;
@@ -119,16 +111,15 @@
             flex-direction: column;
             align-items: center;
             padding: 10px 20px;
-            justify-content: center; /* Centre le message de bienvenue */
+            justify-content: center;
         }
-
         .hero-text h1 { font-size: clamp(28px, 7vw, 48px); line-height: 1.2; text-align: center;}
         .gradient-text {
             background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .subtitle { color: #c4c7c5; }
+        .subtitle { color: #c4c7c5; text-align: center; }
 
         .suggestions {
             display: flex;
@@ -140,7 +131,6 @@
             padding: 10px 5px;
             scrollbar-width: none;
         }
-
         .card {
             min-width: 150px;
             background: white;
@@ -149,18 +139,18 @@
             font-size: 13px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
             flex-shrink: 0;
+            cursor: pointer;
         }
 
-        /* --- BARRE DE CHAT OPTIMISÉE --- */
+        /* --- INPUT BAR --- */
         .bottom-container {
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
-            padding: 10px 15px 20px 15px; /* Padding raisonnable */
+            padding: 10px 15px 20px 15px;
             background-color: #f8fbff;
             flex-shrink: 0;
         }
-
         .input-box {
             background: white;
             border-radius: 28px;
@@ -170,7 +160,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             border: 1px solid #e1e4e8;
         }
-
         .input-box input {
             flex: 1;
             border: none;
@@ -179,10 +168,8 @@
             padding: 12px 0;
             background: transparent;
         }
-
         .send-btn { width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .send-btn img { width: 100%; }
-
         .disclaimer { font-size: 10px; color: #70757a; margin-top: 8px; text-align: center; }
 
         .overlay {
@@ -205,7 +192,8 @@
             <span class="sidebar-brand">TchitChat</span>
         </div>
         <button class="btn-new-chat" onclick="location.reload()">+ Nouveau chat</button>
-        <div class="sidebar-footer" id="sidebarFooter"></div>
+        <div class="sidebar-footer" id="sidebarFooter">
+            </div>
     </aside>
 
     <main class="main-content">
@@ -234,36 +222,53 @@
         </div>
     </main>
 
-    <script>
-        // Gestion du Menu
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o",
+            authDomain: "tchitchat-ia.firebaseapp.com",
+            projectId: "tchitchat-ia",
+            storageBucket: "tchitchat-ia.firebasestorage.app",
+            messagingSenderId: "784697397736",
+            appId: "1:784697397736:web:55295804d84feafda7945d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // UI Elements
         const sidebar = document.getElementById('sidebar');
         const menuBtn = document.getElementById('menuBtn');
         const overlay = document.getElementById('overlay');
         const footer = document.getElementById('sidebarFooter');
-        let isConnected = false;
-
-        function updateMenu() {
-            if (isConnected) {
-                footer.innerHTML = `<button class="btn-settings">⚙️ Paramètres</button><button class="btn-settings" style="color:#d96570;" onclick="isConnected=false; updateMenu()">Déconnexion</button>`;
-            } else {
-                footer.innerHTML = `<button class="btn-auth" onclick="isConnected=true; updateMenu()">Se connecter</button><button class="btn-auth btn-signup">Créer un compte</button>`;
-            }
-        }
-        updateMenu();
-
-        menuBtn.addEventListener('click', () => { sidebar.classList.add('active'); overlay.classList.add('active'); });
-        overlay.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); });
-
-        // Gestion de l'input
-        const sendBtn = document.getElementById('sendBtn');
         const userInput = document.getElementById('userInput');
 
-        function fillInput(text) { userInput.value = text; userInput.focus(); }
-        sendBtn.addEventListener('click', () => { if(userInput.value.trim() !== "") { alert("Message envoyé !"); userInput.value = ""; } });
-        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendBtn.click(); });
+        // Authentication State
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                footer.innerHTML = `
+                    <button class="btn-settings">⚙️ Paramètres</button>
+                    <button class="btn-settings" style="color:#d96570;" id="logoutBtn">Déconnexion</button>
+                `;
+                document.getElementById('logoutBtn').onclick = () => signOut(auth);
+            } else {
+                footer.innerHTML = `
+                    <a href="login/" class="btn-auth">Se connecter</a>
+                    <a href="signup/" class="btn-auth btn-signup">Créer un compte</a>
+                `;
+            }
+        });
 
-        /* SCRIPT POUR LE CLAVIER MOBILE */
-        // Ajuste la hauteur quand le clavier change la taille de la fenêtre
+        // Menu Toggle
+        menuBtn.onclick = () => { sidebar.classList.add('active'); overlay.classList.add('active'); };
+        overlay.onclick = () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); };
+
+        // Helper functions
+        window.fillInput = (text) => { userInput.value = text; userInput.focus(); };
+
+        // Keyboard / Viewport Fix
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', () => {
                 document.body.style.height = window.visualViewport.height + 'px';
