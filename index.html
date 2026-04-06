@@ -49,10 +49,7 @@
             margin-bottom: 20px;
         }
 
-        .sidebar-logo {
-            width: 30px;
-            height: auto;
-        }
+        .sidebar-logo { width: 30px; height: auto; }
 
         .sidebar-brand {
             font-size: 20px;
@@ -81,9 +78,51 @@
             font-weight: bold;
             color: #5f6368;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             margin-bottom: 10px;
         }
+
+        /* --- SECTION BAS DU MENU (AUTH & SETTINGS) --- */
+        .sidebar-footer {
+            margin-top: auto; /* Pousse tout en bas */
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-top: 20px;
+            border-top: 1px solid #dce1e7;
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #4285f4;
+            background: transparent;
+            color: #4285f4;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-signup {
+            background-color: #4285f4;
+            color: white;
+        }
+
+        .btn-settings {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            color: #1f1f1f;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-settings:hover { background: #e2e7ed; border-radius: 8px; }
 
         /* --- MAIN CONTENT --- */
         .main-content {
@@ -95,25 +134,10 @@
             position: relative;
         }
 
-        header {
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            flex-shrink: 0;
-        }
+        header { padding: 10px 15px; display: flex; align-items: center; }
 
-        .menu-toggle {
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .menu-toggle img {
-            width: 24px;
-        }
+        .menu-toggle { width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .menu-toggle img { width: 24px; }
 
         .chat-area {
             flex: 1;
@@ -126,15 +150,12 @@
         }
 
         .hero-text { margin-top: auto; margin-bottom: 20px; }
-
         .hero-text h1 { font-size: clamp(32px, 8vw, 56px); line-height: 1.2; }
-
         .gradient-text {
             background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .subtitle { color: #c4c7c5; }
 
         .suggestions {
@@ -158,13 +179,13 @@
             flex-shrink: 0;
         }
 
-        /* --- BARRE DE CHAT REMONTÉE --- */
+        /* --- BARRE DE CHAT ENCORE PLUS HAUTE --- */
         .bottom-container {
             flex-shrink: 0;
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
-            padding: 10px 15px 45px 15px; /* Augmenté de 20px à 45px pour remonter la barre */
+            padding: 10px 15px 70px 15px; /* Passé de 45px à 70px */
             background-color: #f8fbff;
         }
 
@@ -187,23 +208,10 @@
             background: transparent;
         }
 
-        .send-btn {
-            width: 35px;
-            height: 35px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
+        .send-btn { width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .send-btn img { width: 100%; }
 
-        .disclaimer {
-            font-size: 11px;
-            color: #70757a;
-            margin-top: 10px;
-            text-align: center;
-        }
+        .disclaimer { font-size: 11px; color: #70757a; margin-top: 10px; text-align: center; }
 
         .overlay {
             display: none;
@@ -212,7 +220,6 @@
             background: rgba(0,0,0,0.3);
             z-index: 999;
         }
-
         .overlay.active { display: block; }
     </style>
 </head>
@@ -226,20 +233,18 @@
             <span class="sidebar-brand">TchitChat</span>
         </div>
 
-        <button class="btn-new-chat" onclick="location.reload()">
-            + Nouveau chat
-        </button>
+        <button class="btn-new-chat" onclick="location.reload()">+ Nouveau chat</button>
 
         <div class="conv-title">Conversations</div>
-        
         <p style="font-size: 13px; color: #70757a; padding-left: 5px;">Aucune discussion récente</p>
+
+        <div class="sidebar-footer" id="sidebarFooter">
+            </div>
     </aside>
 
     <main class="main-content">
         <header>
-            <div class="menu-toggle" id="menuBtn">
-                <img src="menu.png" alt="Menu">
-            </div>
+            <div class="menu-toggle" id="menuBtn"><img src="menu.png" alt="Menu"></div>
         </header>
 
         <div class="chat-area">
@@ -247,7 +252,6 @@
                 <h1><span class="gradient-text">Bienvenue</span></h1>
                 <h1 class="subtitle">Sur TchitChat</h1>
             </div>
-
             <section class="suggestions">
                 <div class="card" onclick="fillInput('Rédige une blague')">Blague 🎭</div>
                 <div class="card" onclick="fillInput('Idée de cadeau')">Cadeau 🎁</div>
@@ -258,9 +262,7 @@
         <div class="bottom-container">
             <div class="input-box">
                 <input type="text" id="userInput" placeholder="Ecrivez à TchitChat...">
-                <div class="send-btn" id="sendBtn">
-                    <img src="send.png" alt="Envoyer">
-                </div>
+                <div class="send-btn" id="sendBtn"><img src="send.png" alt="Envoyer"></div>
             </div>
             <p class="disclaimer">TchitChat peut faire des erreurs.</p>
         </div>
@@ -272,6 +274,26 @@
         const overlay = document.getElementById('overlay');
         const sendBtn = document.getElementById('sendBtn');
         const userInput = document.getElementById('userInput');
+        const footer = document.getElementById('sidebarFooter');
+
+        // Simulation de l'état de connexion (change sur 'true' pour voir les paramètres)
+        let isConnected = false;
+
+        function updateMenu() {
+            if (isConnected) {
+                footer.innerHTML = `
+                    <button class="btn-settings">⚙️ Paramètres</button>
+                    <button class="btn-settings" onclick="isConnected=false; updateMenu()">Déconnexion</button>
+                `;
+            } else {
+                footer.innerHTML = `
+                    <button class="btn-auth" onclick="isConnected=true; updateMenu()">Se connecter</button>
+                    <button class="btn-auth btn-signup">Créer un compte</button>
+                    <button class="btn-settings" style="margin-top:5px;">⚙️ Paramètres</button>
+                `;
+            }
+        }
+        updateMenu();
 
         menuBtn.addEventListener('click', () => {
             sidebar.classList.add('active');
