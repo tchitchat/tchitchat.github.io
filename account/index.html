@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Mon Compte - TchitChat</title>
+    <link rel="icon" type="image/x-icon" href="../tchitchat.ico">
+    <style>
+        :root {
+            --bg: #f8fbff;
+            --card-bg: white;
+            --text: #1f1f1f;
+            --border: #dce1e7;
+            --accent: #4285f4;
+            --danger: #d93025;
+        }
+
+        [data-theme="dark"] {
+            --bg: #131314;
+            --card-bg: #1e1e20;
+            --text: #e3e3e3;
+            --border: #444746;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.3s, color 0.3s; }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100dvh;
+        }
+
+        header {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-btn {
+            width: 40px; height: 40px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .back-btn img { width: 24px; filter: invert(0.5); }
+
+        .container {
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .user-email {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .menu-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .btn-action {
+            width: 100%;
+            padding: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-action:hover { background: var(--border); }
+        .btn-danger { color: var(--danger); border-color: var(--danger); }
+
+        /* --- POPUPS --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .modal-content h3 { margin-bottom: 15px; }
+        .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-btns button { flex: 1; padding: 12px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; }
+        
+        .confirm-del { background: var(--danger); color: white; }
+        .input-verify { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="back-btn" onclick="window.history.back()">
+            <img src="../back.png" alt="Retour">
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="user-email" id="displayEmail">Chargement...</div>
+
+        <div class="menu-list">
+            <button class="btn-action" id="btnPass" style="display: none;">Changer de mot de passe</button>
+            <button class="btn-action" id="btnTheme">Changer de thème <span>🌓</span></button>
+            <button class="btn-action" id="btnLang">Changer la langue <span>🌐</span></button>
+            <button class="btn-action" id="btnLogout">Se déconnecter</button>
+            <button class="btn-action btn-danger" id="btnDelete">Supprimer le compte</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modalLogout">
+        <div class="modal-content">
+            <h3>Se déconnecter ?</h3>
+            <p>Voulez-vous vraiment quitter TchitChat ?</p>
+            <div class="modal-btns">
+                <button onclick="closeModals()">Annuler</button>
+                <button class="confirm-del" id="confirmLogout">Déconnexion</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalDelete">
+        <div class="modal-content">
+            <h3 style="color: var(--danger);">Supprimer définitivement ?</h3>
+            <p id="delMsg">Veuillez confirmer votre identité.</p>
+            <div id="reauthContainer"></div>
+            <div class="modal-btns">
+                <button onclick="closeModals()">Annuler</button>
+                <button class="confirm-del" id="finalDelete">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, deleteUser, reauthenticateWithCredential, EmailAuthProvider, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o",
+            authDomain: "tchitchat-ia.firebaseapp.com",
+            projectId: "tchitchat-ia",
+            storageBucket: "tchitchat-ia.firebasestorage.app",
+            messagingSenderId: "784697397736",
+            appId: "1:784697397736:web:55295804d84feafda7945d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // --- GESTION ÉTAT CONNEXION ---
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "../login/";
+            } else {
+                document.getElementById('displayEmail').innerText = user.email;
+                
+                // Vérifie si c'est un compte Email ou Google
+                const isEmailUser = user.providerData.some(p => p.providerId === 'password');
+                if (isEmailUser) {
+                    document.getElementById('btnPass').style.display = 'flex';
+                }
+            }
+        });
+
+        // --- THÈME ---
+        const btnTheme = document.getElementById('btnTheme');
+        btnTheme.onclick = () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const target = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', target);
+            localStorage.setItem('theme', target);
+        };
+        if(localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+
+        // --- DÉCONNEXION ---
+        document.getElementById('btnLogout').onclick = () => document.getElementById('modalLogout').style.display = 'flex';
+        document.getElementById('confirmLogout').onclick = () => signOut(auth);
+
+        // --- MOT DE PASSE ---
+        document.getElementById('btnPass').onclick = () => {
+            sendPasswordResetEmail(auth, auth.currentUser.email)
+                .then(() => alert("Email de réinitialisation envoyé !"))
+                .catch(err => alert(err.message));
+        };
+
+        // --- SUPPRESSION COMPTE ---
+        const btnDelete = document.getElementById('btnDelete');
+        const reauthContainer = document.getElementById('reauthContainer');
+
+        btnDelete.onclick = () => {
+            document.getElementById('modalDelete').style.display = 'flex';
+            const provider = auth.currentUser.providerData[0].providerId;
+            
+            if(provider === 'password') {
+                reauthContainer.innerHTML = `<input type="password" id="reauthPass" class="input-verify" placeholder="Entrez votre mot de passe">`;
+            } else if(provider === 'google.com') {
+                reauthContainer.innerHTML = `<button class="btn-action" id="reauthGoogle" style="margin-top:10px; justify-content:center;">Se reconnecter avec Google</button>`;
+                document.getElementById('reauthGoogle').onclick = async () => {
+                    await signInWithPopup(auth, new GoogleAuthProvider());
+                    alert("Identité vérifiée ! Cliquez sur Supprimer.");
+                };
+            }
+        };
+
+        document.getElementById('finalDelete').onclick = async () => {
+            const user = auth.currentUser;
+            try {
+                // Si email, on ré-authentifie avant
+                const passInput = document.getElementById('reauthPass');
+                if(passInput) {
+                    const cred = EmailAuthProvider.credential(user.email, passInput.value);
+                    await reauthenticateWithCredential(user, cred);
+                }
+                await deleteUser(user);
+                window.location.href = "../";
+            } catch (err) {
+                alert("Erreur : " + err.message);
+            }
+        };
+
+        // --- UTILS ---
+        window.closeModals = () => {
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        };
+
+        // Langue (Simplifié pour le popup)
+        document.getElementById('btnLang').onclick = () => {
+            const lang = prompt("Choisissez votre langue (Français, English, Español) :");
+            if(lang) alert("Langue changée en : " + lang);
+        };
+    </script>
+</body>
+  </html>
