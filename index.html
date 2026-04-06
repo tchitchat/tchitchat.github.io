@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TchitChat</title>
     <style>
-        /* Reset et base */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,220 +12,239 @@
         }
 
         body {
-            font-family: 'Google Sans', Arial, sans-serif;
-            background-color: #f0f4f9;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fbff;
             color: #1f1f1f;
             display: flex;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* Barre latérale */
+        /* --- SIDEBAR MOBILE --- */
         .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
             width: 280px;
-            background-color: #f0f4f8;
-            display: flex;
-            flex-direction: column;
-            padding: 15px;
-            justify-content: space-between;
+            height: 100%;
+            background-color: #f0f4f9;
+            z-index: 1000;
+            transition: 0.3s;
+            padding: 20px;
+            border-right: 1px solid #dce1e7;
         }
 
-        .menu-btn {
-            font-size: 24px;
-            padding: 10px;
-            cursor: pointer;
-            width: fit-content;
-            border-radius: 50%;
+        .sidebar.active {
+            left: 0;
         }
 
-        .menu-btn:hover {
-            background-color: #e2e7ed;
+        .brand-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #4285f4;
+            margin-bottom: 30px;
         }
 
-        .new-chat-btn {
-            margin-top: 40px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            background-color: #e6eaf1;
-            border: none;
-            border-radius: 50px;
-            color: #444746;
-            font-weight: 500;
-            cursor: pointer;
-            width: fit-content;
-        }
-
-        /* Conteneur principal */
+        /* --- MAIN CONTENT --- */
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 0 20px;
+            width: 100%;
             position: relative;
         }
 
-        /* Header avec le dégradé style Gemini */
-        .header {
-            margin-top: 10vh;
-            width: 100%;
-            max-width: 800px;
+        header {
+            padding: 15px;
+            display: flex;
+            align-items: center;
         }
 
-        .header h1 {
-            font-size: 56px;
-            font-weight: 500;
-            margin-bottom: 8px;
+        .menu-toggle {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
         }
 
-        .greeting {
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(32px, 8vw, 56px); /* S'adapte à la taille de l'écran */
+            line-height: 1.2;
+        }
+
+        .gradient-text {
             background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .subtitle {
-            font-size: 56px;
             color: #c4c7c5;
-            font-weight: 500;
         }
 
-        /* Grille de suggestions */
+        /* --- SUGGESTIONS (Scrollable sur Mobile) --- */
         .suggestions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            display: flex;
             gap: 12px;
             width: 100%;
             max-width: 800px;
-            margin-top: 50px;
+            margin-top: 30px;
+            overflow-x: auto; /* Permet de swiper les cartes sur tel */
+            padding: 10px;
+            scrollbar-width: none;
         }
 
         .card {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            min-height: 140px;
+            min-width: 160px;
+            background: white;
+            padding: 15px;
+            border-radius: 16px;
+            font-size: 14px;
+            text-align: left;
             cursor: pointer;
-            position: relative;
-            transition: background-color 0.2s;
-            font-size: 15px;
-            line-height: 1.5;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            flex-shrink: 0;
         }
 
-        .card:hover {
-            background-color: #e9eef6;
-        }
-
-        .card-icon {
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            background: #f0f4f9;
-            padding: 8px;
-            border-radius: 50%;
-        }
-
-        /* Zone de saisie en bas */
+        /* --- INPUT AREA FIXÉE EN BAS --- */
         .bottom-container {
-            position: absolute;
-            bottom: 20px;
             width: 100%;
             max-width: 800px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin: 0 auto;
+            padding: 10px 15px 30px 15px;
         }
 
         .input-box {
-            width: 100%;
-            background-color: #ffffff;
-            border-radius: 30px;
+            background: white;
+            border-radius: 28px;
             display: flex;
             align-items: center;
-            padding: 10px 24px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            padding: 10px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         }
 
         .input-box input {
             flex: 1;
             border: none;
             outline: none;
-            padding: 12px 0;
             font-size: 16px;
-            background: transparent;
+            padding: 8px;
         }
 
-        .input-icons {
-            display: flex;
-            gap: 20px;
-            color: #444746;
-            font-size: 20px;
+        .send-btn {
+            color: #4285f4;
+            font-size: 22px;
             cursor: pointer;
+            margin-left: 10px;
+            transition: 0.2s;
+        }
+
+        .send-btn:active {
+            transform: scale(0.9);
         }
 
         .disclaimer {
-            font-size: 12px;
-            color: #5f6368;
-            margin-top: 15px;
+            font-size: 11px;
+            color: #70757a;
+            margin-top: 10px;
             text-align: center;
         }
 
+        /* Overlay quand le menu est ouvert */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 999;
+        }
+
+        .overlay.active { display: block; }
     </style>
 </head>
 <body>
 
-    <aside class="sidebar">
-        <div>
-            <div class="menu-btn">☰</div>
-            <button class="new-chat-btn">
-                <span>+</span> Nouveau chat
-            </button>
-        </div>
-        <div class="sidebar-footer">
-            </div>
+    <div class="overlay" id="overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="brand-name">TchitChat</div>
+        <p style="font-size: 14px; color: #5f6368;">Historique récent vide</p>
     </aside>
 
     <main class="main-content">
-        <header class="header">
-            <h1><span class="greeting">Bonjour, l'ami</span></h1>
-            <h1 class="subtitle">Comment puis-je vous aider ?</h1>
+        <header>
+            <div class="menu-toggle" id="menuBtn">☰</div>
         </header>
 
-        <section class="suggestions">
-            <div class="card">
-                Explique-moi comment fonctionne une API
-                <div class="card-icon">💡</div>
+        <div class="chat-area">
+            <div class="hero-text">
+                <h1><span class="gradient-text">Bienvenue</span></h1>
+                <h1 class="subtitle">Sur TchitChat</h1>
             </div>
-            <div class="card">
-                Donne-moi des idées de snacks sains
-                <div class="card-icon">🍎</div>
-            </div>
-            <div class="card">
-                Aide-moi à écrire un poème sur la pluie
-                <div class="card-icon">✍️</div>
-            </div>
-            <div class="card">
-                Quelles sont les meilleures extensions VS Code ?
-                <div class="card-icon">💻</div>
-            </div>
-        </section>
+
+            <section class="suggestions">
+                <div class="card" onclick="fillInput('Rédige une blague courte')">Rédige une blague courte 🎭</div>
+                <div class="card" onclick="fillInput('Idée de cadeau pour un ami')">Idée de cadeau pour un ami 🎁</div>
+                <div class="card" onclick="fillInput('Recette de pâtes simple')">Recette de pâtes simple 🍝</div>
+            </section>
+        </div>
 
         <div class="bottom-container">
             <div class="input-box">
-                <input type="text" placeholder="Entrez une invite ici">
-                <div class="input-icons">
-                    <span>🖼️</span>
-                    <span>🎤</span>
-                    <span style="color: #4285f4;">➤</span>
-                </div>
+                <input type="text" id="userInput" placeholder="Demandez-moi n'importe quoi...">
+                <span class="send-btn" id="sendBtn">➤</span>
             </div>
-            <p class="disclaimer">
-                Gemini peut afficher des informations inexactes, y compris sur des personnes. Vérifiez ses réponses.
-            </p>
+            <p class="disclaimer">TchitChat peut faire des erreurs.</p>
         </div>
     </main>
 
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const menuBtn = document.getElementById('menuBtn');
+        const overlay = document.getElementById('overlay');
+        const sendBtn = document.getElementById('sendBtn');
+        const userInput = document.getElementById('userInput');
+
+        // Gérer le menu mobile
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Fonction pour remplir l'input via les cartes
+        function fillInput(text) {
+            userInput.value = text;
+            userInput.focus();
+        }
+
+        // Action du bouton envoyer
+        sendBtn.addEventListener('click', () => {
+            if(userInput.value.trim() !== "") {
+                alert("Message envoyé : " + userInput.value);
+                userInput.value = ""; // Vide l'input après envoi
+            }
+        });
+
+        // Envoyer avec la touche Entrée
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendBtn.click();
+            }
+        });
+    </script>
 </body>
 </html>
