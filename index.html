@@ -9,6 +9,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', sans-serif; background-color: #f8fbff; display: flex; height: 100dvh; overflow: hidden; }
 
+        /* --- SIDEBAR --- */
         .sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background-color: #f0f4f9; z-index: 1000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; border-right: 1px solid #dce1e7; display: flex; flex-direction: column; }
         .sidebar.active { left: 0; }
         .sidebar-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
@@ -16,11 +17,15 @@
         .sidebar-brand { font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .btn-new-chat { background-color: #4285f4; color: white; border: none; border-radius: 12px; padding: 12px; font-weight: 600; width: 100%; text-align: left; margin-bottom: 25px; cursor: pointer; }
 
-        .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 20px; border-top: 1px solid #dce1e7; }
-        .btn-auth { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #4285f4; background: transparent; color: #4285f4; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; font-size: 14px; }
+        /* --- FOOTER MENU --- */
+        .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 5px; padding-top: 20px; border-top: 1px solid #dce1e7; }
+        .btn-auth { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #4285f4; background: transparent; color: #4285f4; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; font-size: 14px; margin-bottom: 5px; }
         .btn-signup { background-color: #4285f4; color: white; }
-        .btn-settings { width: 100%; padding: 12px; background: transparent; border: none; text-align: left; display: flex; align-items: center; gap: 12px; border-radius: 10px; cursor: pointer; }
+        
+        .btn-menu-item { width: 100%; padding: 12px; background: transparent; border: none; text-align: left; display: block; color: #1f1f1f; text-decoration: none; font-size: 15px; border-radius: 10px; cursor: pointer; }
+        .btn-menu-item:hover { background: #e2e7ed; }
 
+        /* --- MAIN CONTENT --- */
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100%; width: 100%; position: relative; justify-content: space-between; }
         header { padding: 10px 15px; flex-shrink: 0; }
         .menu-toggle { width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; }
@@ -34,8 +39,8 @@
         .suggestions { display: flex; gap: 12px; width: 100%; max-width: 800px; margin-top: 20px; overflow-x: auto; padding: 10px 5px; scrollbar-width: none; }
         .card { min-width: 150px; background: white; padding: 15px; border-radius: 16px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); flex-shrink: 0; cursor: pointer; }
 
-        /* BARRE REMONTÉE */
-        .bottom-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px 15px 120px 15px; background-color: #f8fbff; flex-shrink: 0; }
+        /* --- BARRE DE CHAT AJUSTÉE (80px) --- */
+        .bottom-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px 15px 80px 15px; background-color: #f8fbff; flex-shrink: 0; }
         .input-box { background: white; border-radius: 28px; display: flex; align-items: center; padding: 5px 10px 5px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e1e4e8; }
         .input-box input { flex: 1; border: none; outline: none; font-size: 16px; padding: 12px 0; background: transparent; }
         .send-btn { width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -81,7 +86,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o",
@@ -101,10 +106,17 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                footer.innerHTML = `<button class="btn-settings">⚙️ Paramètres</button><button class="btn-settings" style="color:#d96570;" id="logoutBtn">Déconnexion</button>`;
-                document.getElementById('logoutBtn').onclick = () => signOut(auth);
+                // Menu une fois connecté
+                footer.innerHTML = `
+                    <a href="account/" class="btn-menu-item">Compte</a>
+                    <button class="btn-menu-item">Paramètres</button>
+                `;
             } else {
-                footer.innerHTML = `<a href="login/" class="btn-auth">Se connecter</a><a href="signup/" class="btn-auth btn-signup">Créer un compte</a>`;
+                // Menu déconnecté
+                footer.innerHTML = `
+                    <a href="login/" class="btn-auth">Se connecter</a>
+                    <a href="signup/" class="btn-auth btn-signup">Créer un compte</a>
+                `;
             }
         });
 
