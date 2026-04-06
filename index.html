@@ -19,11 +19,10 @@
             color: #1f1f1f;
             display: flex;
             height: 100vh;
-            /* Empêche le rebond du scroll sur tout le corps */
             overflow: hidden; 
         }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR (MENU) --- */
         .sidebar {
             position: fixed;
             left: -280px;
@@ -32,13 +31,58 @@
             height: 100%;
             background-color: #f0f4f9;
             z-index: 1000;
-            transition: 0.3s;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             padding: 20px;
             border-right: 1px solid #dce1e7;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar.active {
             left: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo {
+            width: 30px;
+            height: auto;
+        }
+
+        .sidebar-brand {
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #4285f4, #9b72cb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-new-chat {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .conv-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #5f6368;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
         }
 
         /* --- MAIN CONTENT --- */
@@ -46,7 +90,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            height: 100vh; /* Force la hauteur de l'écran */
+            height: 100vh;
             width: 100%;
             position: relative;
         }
@@ -55,10 +99,9 @@
             padding: 10px 15px;
             display: flex;
             align-items: center;
-            flex-shrink: 0; /* Empêche le header de s'écraser */
+            flex-shrink: 0;
         }
 
-        /* Bouton Menu avec image */
         .menu-toggle {
             width: 40px;
             height: 40px;
@@ -69,14 +112,12 @@
         }
 
         .menu-toggle img {
-            width: 24px; /* Taille standard icône */
-            height: auto;
+            width: 24px;
         }
 
-        /* ZONE SCROLLABLE (Le contenu du milieu) */
         .chat-area {
             flex: 1;
-            overflow-y: auto; /* Seule cette partie scrolle */
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -84,15 +125,9 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        .hero-text {
-            margin-top: auto;
-            margin-bottom: 20px;
-        }
+        .hero-text { margin-top: auto; margin-bottom: 20px; }
 
-        .hero-text h1 {
-            font-size: clamp(32px, 8vw, 56px);
-            line-height: 1.2;
-        }
+        .hero-text h1 { font-size: clamp(32px, 8vw, 56px); line-height: 1.2; }
 
         .gradient-text {
             background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570);
@@ -102,7 +137,6 @@
 
         .subtitle { color: #c4c7c5; }
 
-        /* SUGGESTIONS */
         .suggestions {
             display: flex;
             gap: 12px;
@@ -120,20 +154,18 @@
             padding: 15px;
             border-radius: 16px;
             font-size: 14px;
-            text-align: left;
-            cursor: pointer;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
             flex-shrink: 0;
         }
 
-        /* --- BARRE DE CHAT FIXÉE --- */
+        /* --- BARRE DE CHAT REMONTÉE --- */
         .bottom-container {
-            flex-shrink: 0; /* Ne bouge jamais */
+            flex-shrink: 0;
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
-            padding: 10px 15px 20px 15px;
-            background-color: #f8fbff; /* Même couleur que le fond */
+            padding: 10px 15px 45px 15px; /* Augmenté de 20px à 45px pour remonter la barre */
+            background-color: #f8fbff;
         }
 
         .input-box {
@@ -164,10 +196,7 @@
             justify-content: center;
         }
 
-        .send-btn img {
-            width: 100%;
-            height: auto;
-        }
+        .send-btn img { width: 100%; }
 
         .disclaimer {
             font-size: 11px;
@@ -192,8 +221,18 @@
     <div class="overlay" id="overlay"></div>
 
     <aside class="sidebar" id="sidebar">
-        <div style="font-size: 22px; font-weight: bold; color: #4285f4; margin-bottom: 30px;">TchitChat</div>
-        <p style="font-size: 14px; color: #5f6368;">Historique vide</p>
+        <div class="sidebar-header">
+            <img src="logo.png" alt="Logo" class="sidebar-logo">
+            <span class="sidebar-brand">TchitChat</span>
+        </div>
+
+        <button class="btn-new-chat" onclick="location.reload()">
+            + Nouveau chat
+        </button>
+
+        <div class="conv-title">Conversations</div>
+        
+        <p style="font-size: 13px; color: #70757a; padding-left: 5px;">Aucune discussion récente</p>
     </aside>
 
     <main class="main-content">
@@ -213,7 +252,6 @@
                 <div class="card" onclick="fillInput('Rédige une blague')">Blague 🎭</div>
                 <div class="card" onclick="fillInput('Idée de cadeau')">Cadeau 🎁</div>
                 <div class="card" onclick="fillInput('Recette simple')">Recette 🍝</div>
-                <div class="card" onclick="fillInput('Code-moi un jeu')">Code 💻</div>
             </section>
         </div>
 
