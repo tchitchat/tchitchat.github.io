@@ -38,12 +38,6 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .back-btn {
-            width: 40px; height: 40px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .back-btn img { width: 24px; filter: invert(0.5); }
-
         .container {
             max-width: 500px;
             margin: 40px auto;
@@ -108,8 +102,8 @@
 <body>
 
     <header>
-        <div class="back-btn" onclick="window.history.back()">
-            <img src="../back.png" alt="Retour">
+        <div onclick="window.history.back()">
+            <img src="/back.png" alt="Retour">
         </div>
     </header>
 
