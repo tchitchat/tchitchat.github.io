@@ -7,24 +7,84 @@
     <link rel="icon" type="image/x-icon" href="../tchitchat.ico">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fbff; display: flex; justify-content: center; align-items: center; min-height: 100dvh; }
-        .auth-card { background: white; padding: 30px; border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 90%; max-width: 400px; text-align: center; }
-        .logo { width: 50px; margin-bottom: 10px; }
-        h1 { font-size: 22px; margin-bottom: 20px; }
-
-        .social-btn {
-            width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #dce1e7;
-            background: white; display: flex; align-items: center; justify-content: center; gap: 10px;
-            cursor: pointer; font-weight: 600; transition: 0.2s;
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #f8fbff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100dvh; 
         }
+        .auth-card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 28px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+            width: 90%; 
+            max-width: 400px; 
+            text-align: center; 
+        }
+        .logo { width: 50px; margin-bottom: 10px; }
+        h1 { font-size: 22px; margin-bottom: 20px; color: #1f1f1f; }
+
+        .social-btn { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 10px; 
+            border-radius: 12px; 
+            border: 1px solid #dce1e7; 
+            background: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 14px; 
+            transition: 0.2s;
+        }
+        .social-btn:hover { background-color: #f1f3f4; }
         .social-btn img { width: 20px; }
-        .apple-btn { background-color: #000; color: white; border: none; }
 
-        .divider { margin: 20px 0; display: flex; align-items: center; color: #70757a; font-size: 12px; }
-        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #dce1e7; margin: 0 10px; }
+        .divider { 
+            margin: 20px 0; 
+            display: flex; 
+            align-items: center; 
+            color: #70757a; 
+            font-size: 12px; 
+        }
+        .divider::before, .divider::after { 
+            content: ""; 
+            flex: 1; 
+            height: 1px; 
+            background: #dce1e7; 
+            margin: 0 10px; 
+        }
 
-        input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #dce1e7; outline: none; }
-        .btn-primary { width: 100%; padding: 14px; background: #4285f4; color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            margin-bottom: 10px; 
+            border-radius: 12px; 
+            border: 1px solid #dce1e7; 
+            outline: none; 
+            font-size: 16px; 
+        }
+        input:focus { border-color: #4285f4; }
+
+        .btn-primary { 
+            width: 100%; 
+            padding: 14px; 
+            background: #4285f4; 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            font-size: 16px; 
+            margin-top: 10px; 
+        }
+        
         .footer-link { margin-top: 20px; font-size: 13px; color: #5f6368; }
         .footer-link a { color: #4285f4; text-decoration: none; font-weight: bold; }
     </style>
@@ -33,28 +93,28 @@
 
 <div class="auth-card">
     <img src="../logo.png" alt="Logo" class="logo">
-    <h1>Connexion</h1>
+    <h1>Bon retour !</h1>
 
     <button class="social-btn" id="googleBtn">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"> Continuer avec Google
     </button>
-    <button class="social-btn apple-btn" id="appleBtn">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" style="filter: invert(1);"> Continuer avec Apple
-    </button>
 
-    <div class="divider">ou</div>
+    <div class="divider">ou utiliser votre email</div>
 
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Mot de passe">
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Mot de passe" required>
     <button class="btn-primary" id="loginBtn">Se connecter</button>
 
-    <div class="footer-link">Pas de compte ? <a href="../signup/">S'inscrire</a></div>
+    <div class="footer-link">
+        Nouveau ici ? <a href="../signup/">Créer un compte</a>
+    </div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, OAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
+  // Ta configuration Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o",
     authDomain: "tchitchat-ia.firebaseapp.com",
@@ -67,25 +127,30 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // Google
+  // Login avec Google
   document.getElementById('googleBtn').onclick = () => {
-    signInWithPopup(auth, new GoogleAuthProvider()).then(() => window.location.href="../");
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then(() => window.location.href="../")
+      .catch((error) => alert("Erreur Google : " + error.message));
   };
 
-  // Apple
-  document.getElementById('appleBtn').onclick = () => {
-    const provider = new OAuthProvider('apple.com');
-    signInWithPopup(auth, provider).then(() => window.location.href="../");
-  };
-
-  // Email
+  // Login avec Email/Pass
   document.getElementById('loginBtn').onclick = () => {
     const email = document.getElementById('email').value;
     const pass = document.getElementById('password').value;
+    
+    if(!email || !pass) return alert("Veuillez remplir tous les champs.");
+
     signInWithEmailAndPassword(auth, email, pass)
       .then(() => window.location.href="../")
-      .catch(err => alert("Erreur : " + err.message));
+      .catch((error) => {
+        let message = "Erreur de connexion.";
+        if(error.code === 'auth/invalid-credential') message = "Email ou mot de passe incorrect.";
+        alert(message);
+      });
   };
 </script>
+
 </body>
 </html>
