@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -13,7 +13,7 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
         
         header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--bg); }
-        .back-btn { cursor: pointer; background: none; border: none; padding: 5px; }
+        .back-btn { cursor: pointer; background: none; border: none; padding: 5px; display: flex; align-items: center; }
         
         #chatMessages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
         
@@ -21,7 +21,7 @@
         .user-msg { align-self: flex-end; background: #4285f4; color: white; border-bottom-right-radius: 4px; }
         .ai-msg { align-self: flex-start; background: var(--card-bg); border: 1px solid var(--border); border-bottom-left-radius: 4px; color: var(--text); }
 
-        .typing { font-style: italic; opacity: 0.6; font-size: 13px; margin-top: 5px; }
+        .typing { font-style: italic; opacity: 0.6; font-size: 13px; margin-top: 5px; align-self: flex-start; padding-left: 10px; }
 
         .input-area { padding: 15px 20px 25px 20px; background: var(--bg); }
         .input-box { background: var(--card-bg); border-radius: 28px; display: flex; align-items: center; padding: 5px 20px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
@@ -33,7 +33,7 @@
 <body>
     <header>
         <button class="back-btn" onclick="location.href='../'">
-            <img src="../back.png" width="24" style="filter: var(--icon-filter);">
+            <img src="../back.png" width="24">
         </button>
         <div style="font-size: 14px; font-weight: 600;">TchitChat AI</div>
         <img src="../logo.png" width="32" style="border-radius: 8px;">
@@ -55,12 +55,19 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", authDomain: "tchitchat-ia.firebaseapp.com", projectId: "tchitchat-ia", storageBucket: "tchitchat-ia.firebasestorage.app", messagingSenderId: "784697397736", appId: "1:784697397736:web:55295804d84feafda7945d" };
+        const firebaseConfig = { 
+            apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", 
+            authDomain: "tchitchat-ia.firebaseapp.com", 
+            projectId: "tchitchat-ia", 
+            storageBucket: "tchitchat-ia.firebasestorage.app", 
+            messagingSenderId: "784697397736", 
+            appId: "1:784697397736:web:55295804d84feafda7945d" 
+        };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // CONFIG GEMINI (A remplir avec ta clé)
+        // CONFIG GEMINI
         const API_KEY = "TON_API_KEY_ICI"; 
         
         const urlParams = new URLSearchParams(window.location.search);
@@ -82,27 +89,31 @@
             return div;
         }
 
-        async function saveMessage(text, isUser) {
-            if(!chatId || !auth.currentUser) return;
+        async function saveMessage(text, isUser, userUid) {
+            if(!chatId || !userUid) return;
             const chatRef = doc(db, "chats", chatId);
             const chatSnap = await getDoc(chatRef);
             const msgData = { text, isUser, time: Date.now() };
 
-            if (!chatSnap.exists()) {
-                await setDoc(chatRef, { 
-                    messages: [msgData],
-                    lastUpdate: Date.now(),
-                    uid: auth.currentUser.uid // Sécurité : Propriétaire du chat
-                });
-            } else {
-                await updateDoc(chatRef, { 
-                    messages: arrayUnion(msgData),
-                    lastUpdate: Date.now()
-                });
+            try {
+                if (!chatSnap.exists()) {
+                    await setDoc(chatRef, { 
+                        messages: [msgData],
+                        lastUpdate: Date.now(),
+                        uid: userUid 
+                    });
+                } else {
+                    await updateDoc(chatRef, { 
+                        messages: arrayUnion(msgData),
+                        lastUpdate: Date.now()
+                    });
+                }
+            } catch (e) {
+                console.error("Erreur de sauvegarde:", e);
             }
         }
 
-        async function askGemini(prompt) {
+        async function askGemini(prompt, userUid) {
             const typing = document.createElement('div');
             typing.className = 'typing';
             typing.innerText = "TchitChat réfléchit...";
@@ -118,51 +129,61 @@
                 const data = await response.json();
                 typing.remove();
 
-                if (data.candidates) {
+                if (data.candidates && data.candidates[0].content) {
                     const aiText = data.candidates[0].content.parts[0].text;
                     addMessage(aiText, false);
-                    saveMessage(aiText, false);
+                    await saveMessage(aiText, false, userUid);
                 }
             } catch (e) {
                 typing.remove();
-                addMessage("Erreur API Gemini. Vérifie ta clé ou ton âge Google.", false);
+                addMessage("Erreur API Gemini. Vérifie ta clé.", false);
             }
         }
 
-        async function handleSend() {
+        async function handleManualSend() {
             const text = userInput.value.trim();
             if (!text || !auth.currentUser) return;
+            const uid = auth.currentUser.uid;
             addMessage(text, true);
             userInput.value = '';
-            await saveMessage(text, true);
-            await askGemini(text);
+            await saveMessage(text, true, uid);
+            await askGemini(text, uid);
         }
 
-        sendBtn.onclick = handleSend;
-        userInput.onkeypress = (e) => { if (e.key === 'Enter') handleSend(); };
+        sendBtn.onclick = handleManualSend;
+        userInput.onkeypress = (e) => { if (e.key === 'Enter') handleManualSend(); };
 
+        // LOGIQUE D'INITIALISATION
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                window.location.href = "../login/"; // Force connexion pour chatter
+                window.location.href = "../login/"; 
                 return;
             }
             
             if (!chatId) return;
+
             const chatRef = doc(db, "chats", chatId);
             const chatSnap = await getDoc(chatRef);
 
             if (chatSnap.exists()) {
-                // Vérifie si l'utilisateur est le proprio (sécurité côté client en plus des règles)
-                if(chatSnap.data().uid !== user.uid) {
-                    addMessage("Accès refusé : Ce chat ne vous appartient pas.", false);
+                const data = chatSnap.data();
+                if(data.uid !== user.uid) {
+                    addMessage("Accès refusé.", false);
                     return;
                 }
-                chatSnap.data().messages.forEach(m => addMessage(m.text, m.isUser));
+                chatBox.innerHTML = ''; 
+                data.messages.forEach(m => addMessage(m.text, m.isUser));
             } else if (initialMsg) {
                 const firstText = decodeURIComponent(initialMsg);
+                
+                // On affiche et on sauve immédiatement puisque 'user' est maintenant chargé
                 addMessage(firstText, true);
-                await saveMessage(firstText, true);
-                await askGemini(firstText);
+                await saveMessage(firstText, true, user.uid);
+                await askGemini(firstText, user.uid);
+                
+                // Nettoie l'URL pour éviter les doublons au rafraîchissement
+                const newUrl = window.location.origin + window.location.pathname + '?id=' + chatId;
+                window.history.pushState({path:newUrl},'',newUrl);
             }
         });
     </script>
