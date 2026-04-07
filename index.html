@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -11,36 +11,29 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); display: flex; height: 100dvh; overflow: hidden; }
 
+        /* Sidebar */
         .sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background-color: var(--bg); z-index: 1000; transition: 0.3s; padding: 20px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
         .sidebar.active { left: 0; }
-        
         .sidebar-brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
         .brand-logo { width: 32px; height: 32px; border-radius: 6px; }
         .brand-text { background: linear-gradient(90deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* Style du bouton Nouveau Chat (Redirige vers l'accueil) */
         .btn-new-chat { background-color: #4285f4; color: white !important; border: none; border-radius: 12px; padding: 12px; width: 100%; margin-bottom: 15px; cursor: pointer; font-weight: 600; text-align: center; text-decoration: none; display: block; }
 
-        /* Liste des discussions dans la sidebar */
         .history-label { font-size: 12px; font-weight: bold; color: #70757a; margin: 10px 0; text-transform: uppercase; }
         #chatList { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; }
-        .chat-item { padding: 10px; border-radius: 8px; font-size: 14px; cursor: pointer; color: var(--text); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid transparent; }
+        .chat-item { padding: 10px; border-radius: 8px; font-size: 14px; cursor: pointer; color: var(--text); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .chat-item:hover { background: var(--border); }
 
-        .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding-top: 20px; border-top: 1px solid var(--border); }
-        .btn-auth { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #4285f4; background: transparent; color: #4285f4; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; font-size: 14px; }
-        .btn-signup { background-color: #4285f4; color: white; }
-        .btn-menu-item { width: 100%; padding: 12px; background: transparent; border: none; text-align: left; color: var(--text); text-decoration: none; font-size: 15px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
-
+        /* Main Content */
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100%; width: 100%; }
         header { padding: 10px 15px; }
         .menu-toggle { width: 40px; cursor: pointer; height: 40px; display: flex; align-items: center; }
         .menu-toggle img { width: 24px; }
 
         .chat-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .hero-text h1 { font-size: clamp(28px, 7vw, 48px); text-align: center; }
-        .gradient-text { background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { color: #c4c7c5; }
+        .gradient-text { background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: clamp(32px, 8vw, 48px); font-weight: bold; }
+        .subtitle { color: #c4c7c5; margin-top: 10px; font-weight: 500; }
 
         .bottom-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px 15px 20px 15px; } 
         .input-box { background: var(--card-bg); border-radius: 28px; display: flex; align-items: center; padding: 5px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid var(--border); }
@@ -49,6 +42,9 @@
 
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 999; }
         .overlay.active { display: block; }
+        
+        .sidebar-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border); }
+        .btn-auth { display: block; text-align: center; padding: 10px; background: #4285f4; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -58,21 +54,17 @@
             <img src="logo.png" class="brand-logo">
             <span class="brand-text">TchitChat</span>
         </div>
-        
-        <a href="index.html" class="btn-new-chat" id="txtNewChat">+ Nouveau Chat</a>
-        
-        <div class="history-label" id="txtHistory">Discussions</div>
-        <div id="chatList">
-            </div>
-
+        <a href="index.html" class="btn-new-chat">+ Nouveau Chat</a>
+        <div class="history-label">Discussions</div>
+        <div id="chatList"></div>
         <div class="sidebar-footer" id="sidebarFooter"></div>
     </aside>
 
     <main class="main-content">
         <header><div class="menu-toggle" id="menuBtn"><img src="menu.png"></div></header>
         <div class="chat-area">
-            <h1 class="gradient-text" id="txtWelcome">Bienvenue</h1>
-            <h1 class="subtitle" id="txtSubtitle">Sur TchitChat</h1>
+            <h1 class="gradient-text">Bienvenue</h1>
+            <h1 class="subtitle">Sur TchitChat</h1>
         </div>
         <div class="bottom-container">
             <div class="input-box">
@@ -85,70 +77,69 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", authDomain: "tchitchat-ia.firebaseapp.com", projectId: "tchitchat-ia", storageBucket: "tchitchat-ia.firebasestorage.app", messagingSenderId: "784697397736", appId: "1:784697397736:web:55295804d84feafda7945d" };
+        const firebaseConfig = { 
+            apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", 
+            authDomain: "tchitchat-ia.firebaseapp.com", 
+            projectId: "tchitchat-ia", 
+            storageBucket: "tchitchat-ia.firebasestorage.app", 
+            messagingSenderId: "784697397736", 
+            appId: "1:784697397736:web:55295804d84feafda7945d" 
+        };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Langue et Thème
-        const lang = localStorage.getItem('lang') || 'fr';
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
 
-        // Traduction rapide
-        if(lang === 'en') {
-            document.getElementById('txtWelcome').innerText = "Welcome";
-            document.getElementById('txtSubtitle').innerText = "On TchitChat";
-            document.getElementById('userInput').placeholder = "Write to TchitChat...";
-            document.getElementById('txtNewChat').innerText = "+ New Chat";
-            document.getElementById('txtHistory').innerText = "Recent Chats";
-        }
-
-        // --- CHARGEMENT DES DISCUSSIONS DANS LE MENU ---
-        function loadChatHistory() {
-            const q = query(collection(db, "chats"), orderBy("lastUpdate", "desc"));
+        // --- CHARGEMENT HISTORIQUE ---
+        function loadHistory(user) {
+            const q = query(collection(db, "chats"), where("uid", "==", user.uid), orderBy("lastUpdate", "desc"));
             onSnapshot(q, (snapshot) => {
-                const chatList = document.getElementById('chatList');
-                chatList.innerHTML = '';
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
+                const list = document.getElementById('chatList');
+                list.innerHTML = "";
+                snapshot.forEach(doc => {
                     const item = document.createElement('a');
                     item.className = 'chat-item';
-                    item.href = `chat/?id=${doc.id}`;
-                    // On affiche le premier message comme titre
-                    item.innerText = data.messages[0]?.text || "Chat " + doc.id;
-                    chatList.appendChild(item);
+                    item.href = `./chat/?id=${doc.id}`;
+                    item.innerText = doc.data().messages[0]?.text || "Chat " + doc.id;
+                    list.appendChild(item);
                 });
             });
         }
 
-        // --- LOGIQUE D'ENVOI (Génère l'ID uniquement ici) ---
-        function handleStartChat() {
-            const msg = document.getElementById('userInput').value.trim();
-            if(!msg) return;
+        // --- ENVOI ET GÉNÉRATION ID NUMÉRIQUE ---
+        function handleSend() {
+            const text = document.getElementById('userInput').value.trim();
+            if (!text) return;
+            if (!auth.currentUser) { alert("Connecte-toi d'abord !"); return; }
 
-            // Génère un ID aléatoire
-            const id = Math.random().toString(36).substring(2, 10);
-            // Redirige vers la page chat avec le message initial
-            window.location.href = `chat/?id=${id}&msg=${encodeURIComponent(msg)}`;
+            // Génère un ID composé uniquement de 8 chiffres
+            const numericId = Math.floor(10000000 + Math.random() * 90000000);
+            
+            // On utilise sessionStorage pour cacher le message de l'URL
+            sessionStorage.setItem('pendingMsg', text);
+            
+            // Redirection propre : seulement l'ID dans la barre d'adresse
+            window.location.href = `./chat/?id=${numericId}`;
         }
 
-        document.getElementById('sendBtn').onclick = handleStartChat;
-        document.getElementById('userInput').onkeypress = (e) => { if(e.key === 'Enter') handleStartChat(); };
+        document.getElementById('sendBtn').onclick = handleSend;
+        document.getElementById('userInput').onkeypress = (e) => { if(e.key === 'Enter') handleSend(); };
 
-        // Auth
+        // --- AUTH ---
         onAuthStateChanged(auth, (user) => {
             const footer = document.getElementById('sidebarFooter');
             if (user) {
-                footer.innerHTML = `<a href="account/" class="btn-menu-item"><img src="logo.png" style="width:20px"><span>Compte</span></a>`;
-                loadChatHistory();
+                footer.innerHTML = `<div style="font-size:12px; opacity:0.7; margin-bottom:5px;">Connecté</div>`;
+                loadHistory(user);
             } else {
-                footer.innerHTML = `<a href="login/" class="btn-auth">Connexion</a><a href="signup/" class="btn-auth btn-signup">Inscription</a>`;
+                footer.innerHTML = `<a href="./login/" class="btn-auth">Connexion</a>`;
             }
         });
 
-        // Menu Toggle
+        // Menu UI
         document.getElementById('menuBtn').onclick = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); };
         document.getElementById('overlay').onclick = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); };
     </script>
