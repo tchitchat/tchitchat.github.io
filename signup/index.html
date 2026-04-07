@@ -14,21 +14,42 @@
         
         .auth-card { 
             background: var(--card-bg); 
-            padding: 30px; 
+            padding: 40px 30px; 
             border-radius: 28px; 
             width: 90%; 
             max-width: 400px; 
             text-align: center; 
             border: 1px solid var(--border);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
-        h1 { margin-bottom: 20px; font-size: 24px; }
+        .logo-img { width: 60px; height: 60px; margin-bottom: 15px; border-radius: 12px; }
+        h1 { margin-bottom: 25px; font-size: 24px; font-weight: 600; }
         
+        .btn-google {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 15px;
+        }
+
+        .divider { margin: 20px 0; display: flex; align-items: center; color: #70757a; font-size: 13px; }
+        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); margin: 0 10px; }
+
         input { 
             width: 100%; 
             padding: 14px; 
-            margin: 10px 0; 
+            margin-bottom: 12px; 
             border-radius: 12px; 
             border: 1px solid var(--border); 
             background: transparent; 
@@ -36,6 +57,7 @@
             outline: none; 
             font-size: 16px;
         }
+        input:focus { border-color: #4285f4; border-width: 2px; padding: 13px; }
 
         .btn-primary { 
             width: 100%; 
@@ -50,32 +72,14 @@
             margin-top: 10px;
         }
 
-        .btn-google {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: var(--card-bg);
-            color: var(--text);
-            cursor: pointer;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .footer-link { margin-top: 20px; font-size: 14px; }
-        .footer-link a { color: #4285f4; text-decoration: none; font-weight: bold; }
-        
-        .divider { margin: 20px 0; display: flex; align-items: center; color: #70757a; font-size: 12px; }
-        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); margin: 0 10px; }
+        .footer-link { margin-top: 25px; font-size: 14px; color: #70757a; }
+        .footer-link a { color: #4285f4; text-decoration: none; font-weight: 600; }
     </style>
 </head>
 <body>
 
     <div class="auth-card">
+        <img src="../logo.png" alt="TchitChat Logo" class="logo-img">
         <h1 id="txtTitle">Sign Up</h1>
         
         <button id="googleBtn" class="btn-google">
@@ -100,54 +104,27 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-        const firebaseConfig = { 
-            apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", 
-            authDomain: "tchitchat-ia.firebaseapp.com", 
-            projectId: "tchitchat-ia", 
-            storageBucket: "tchitchat-ia.firebasestorage.app", 
-            messagingSenderId: "784697397736", 
-            appId: "1:784697397736:web:55295804d84feafda7945d" 
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", authDomain: "tchitchat-ia.firebaseapp.com", projectId: "tchitchat-ia", storageBucket: "tchitchat-ia.firebasestorage.app", messagingSenderId: "784697397736", appId: "1:784697397736:web:55295804d84feafda7945d" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Appliquer le thème
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
-
-        // Gérer la langue
         const lang = localStorage.getItem('lang') || (navigator.language.startsWith('fr') ? 'fr' : 'en');
-        if (lang === 'fr') {
+        
+        if(lang === 'fr') {
             document.getElementById('txtTitle').innerText = "Inscription";
             document.getElementById('txtGoogle').innerText = "S'inscrire avec Google";
             document.getElementById('txtDivider').innerText = "ou";
-            document.getElementById('email').placeholder = "Email";
-            document.getElementById('password').placeholder = "Mot de passe (6+ carac.)";
             document.getElementById('signupBtn').innerText = "Créer le compte";
             document.getElementById('txtHaveAccount').innerText = "Déjà un compte ?";
             document.getElementById('txtLink').innerText = "Se connecter";
         }
 
-        // Inscription Google
-        document.getElementById('googleBtn').onclick = () => {
-            signInWithPopup(auth, new GoogleAuthProvider())
-                .then(() => window.location.href = "../")
-                .catch(e => alert(e.message));
-        };
-
-        // Inscription Email
+        document.getElementById('googleBtn').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).then(() => window.location.href="../");
         document.getElementById('signupBtn').onclick = () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            createUserWithEmailAndPassword(auth, email, password)
-                .then(() => window.location.href = "../")
-                .catch(e => {
-                    let msg = e.message;
-                    if (e.code === 'auth/email-already-in-use') msg = (lang === 'fr' ? "Email déjà utilisé." : "Email already in use.");
-                    if (e.code === 'auth/weak-password') msg = (lang === 'fr' ? "Mot de passe trop court." : "Password too weak.");
-                    alert(msg);
-                });
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('password').value;
+            createUserWithEmailAndPassword(auth, e, p).then(() => window.location.href="../").catch(err => alert(err.message));
         };
     </script>
 </body>
