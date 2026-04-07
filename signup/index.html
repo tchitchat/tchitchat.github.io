@@ -1,72 +1,191 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Inscription - TchitChat</title>
+    <title>Sign Up - TchitChat</title>
     <link rel="icon" type="image/x-icon" href="../tchitchat.ico">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fbff; display: flex; justify-content: center; align-items: center; min-height: 100dvh; }
-        .auth-card { background: white; padding: 30px; border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 90%; max-width: 400px; text-align: center; }
-        .logo { width: 50px; margin-bottom: 10px; }
-        h1 { font-size: 22px; margin-bottom: 20px; }
+        :root { 
+            --bg: #f8fbff; 
+            --card-bg: white; 
+            --text: #1f1f1f; 
+            --border: #dce1e7; 
+        }
+        [data-theme="dark"] { 
+            --bg: #131314; 
+            --card-bg: #1e1e20; 
+            --text: #e3e3e3; 
+            --border: #444746; 
+        }
 
-        .social-btn { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #dce1e7; background: white; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.3s, color 0.3s; }
+        
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100dvh; 
+        }
+
+        .auth-card { 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 28px; 
+            width: 90%; 
+            max-width: 400px; 
+            text-align: center; 
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .logo { width: 50px; margin-bottom: 10px; }
+        h1 { font-size: 24px; margin-bottom: 20px; }
+
+        .social-btn { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 15px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            background: var(--card-bg); 
+            color: var(--text);
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 14px; 
+        }
         .social-btn img { width: 20px; }
 
-        .divider { margin: 20px 0; display: flex; align-items: center; color: #70757a; font-size: 12px; }
-        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #dce1e7; margin: 0 10px; }
+        .divider { 
+            margin: 20px 0; 
+            display: flex; 
+            align-items: center; 
+            color: #70757a; 
+            font-size: 12px; 
+        }
+        .divider::before, .divider::after { 
+            content: ""; flex: 1; height: 1px; background: var(--border); margin: 0 10px; 
+        }
 
-        input { width: 100%; padding: 14px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #dce1e7; outline: none; font-size: 16px; }
-        .btn-primary { width: 100%; padding: 14px; background: linear-gradient(90deg, #4285f4, #9b72cb); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 16px; margin-top: 10px; }
-        .footer-link { margin-top: 20px; font-size: 13px; color: #5f6368; }
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            margin-bottom: 10px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            background: transparent; 
+            color: var(--text); 
+            outline: none;
+            font-size: 16px;
+        }
+        input:focus { border-color: #4285f4; }
+
+        .btn-primary { 
+            width: 100%; 
+            padding: 14px; 
+            background: #4285f4; 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            font-size: 16px; 
+            margin-top: 10px; 
+        }
+
+        .footer-link { margin-top: 20px; font-size: 14px; }
         .footer-link a { color: #4285f4; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
+
 <div class="auth-card">
     <img src="../logo.png" alt="Logo" class="logo">
-    <h1>Créer un compte</h1>
+    <h1 id="txtTitle">Create Account</h1>
 
     <button class="social-btn" id="googleBtn">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"> S'inscrire avec Google
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"> <span id="txtGoogle">Sign up with Google</span>
     </button>
 
-    <div class="divider">ou utiliser un email</div>
+    <div class="divider" id="txtDivider">or use email</div>
 
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Mot de passe (6 caractères min.)" required>
-    <button class="btn-primary" id="signupBtn">S'inscrire</button>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password (6+ chars)">
+    <button class="btn-primary" id="signupBtn">Sign Up</button>
 
-    <div class="footer-link">Déjà un compte ? <a href="../login/">Se connecter</a></div>
+    <div class="footer-link">
+        <span id="txtHaveAccount">Already have an account?</span> 
+        <a href="../login/" id="txtLoginLink">Login</a>
+    </div>
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o",
-    authDomain: "tchitchat-ia.firebaseapp.com",
-    projectId: "tchitchat-ia",
-    storageBucket: "tchitchat-ia.firebasestorage.app",
-    messagingSenderId: "784697397736",
-    appId: "1:784697397736:web:55295804d84feafda7945d"
-  };
+    const firebaseConfig = {
+        apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o",
+        authDomain: "tchitchat-ia.firebaseapp.com",
+        projectId: "tchitchat-ia",
+        storageBucket: "tchitchat-ia.firebasestorage.app",
+        messagingSenderId: "784697397736",
+        appId: "1:784697397736:web:55295804d84feafda7945d"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-  document.getElementById('googleBtn').onclick = () => {
-    signInWithPopup(auth, new GoogleAuthProvider()).then(() => window.location.href="../");
-  };
+    // --- GESTION THÈME ET LANGUE ---
+    const lang = localStorage.getItem('lang') || 'en';
+    const theme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
 
-  document.getElementById('signupBtn').onclick = () => {
-    const email = document.getElementById('email').value, pass = document.getElementById('password').value;
-    if(pass.length < 6) return alert("Mot de passe trop court.");
-    createUserWithEmailAndPassword(auth, email, pass).then(() => window.location.href="../").catch(err => alert(err.message));
-  };
+    if (lang === 'fr') {
+        document.getElementById('txtTitle').innerText = "Créer un compte";
+        document.getElementById('txtGoogle').innerText = "S'inscrire avec Google";
+        document.getElementById('txtDivider').innerText = "ou utiliser un email";
+        document.getElementById('email').placeholder = "Email";
+        document.getElementById('password').placeholder = "Mot de passe (6+ carac.)";
+        document.getElementById('signupBtn').innerText = "S'inscrire";
+        document.getElementById('txtHaveAccount').innerText = "Déjà un compte ?";
+        document.getElementById('txtLoginLink').innerText = "Se connecter";
+    }
+
+    // --- LOGIQUE INSCRIPTION ---
+    
+    // Inscription Google
+    document.getElementById('googleBtn').onclick = () => {
+        signInWithPopup(auth, new GoogleAuthProvider())
+            .then(() => window.location.href = "../")
+            .catch(err => alert(err.message));
+    };
+
+    // Inscription Email
+    document.getElementById('signupBtn').onclick = () => {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
+
+        if (pass.length < 6) {
+            alert(lang === 'fr' ? "Le mot de passe doit faire 6 caractères." : "Password must be at least 6 characters.");
+            return;
+        }
+
+        createUserWithEmailAndPassword(auth, email, pass)
+            .then(() => window.location.href = "../")
+            .catch(err => {
+                let msg = err.message;
+                if(err.code === 'auth/email-already-in-use') msg = (lang === 'fr' ? "Email déjà utilisé." : "Email already in use.");
+                alert(msg);
+            });
+    };
 </script>
+
 </body>
 </html>
