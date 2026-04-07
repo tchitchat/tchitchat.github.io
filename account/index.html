@@ -14,6 +14,11 @@
         .btn-action { width: 100%; padding: 16px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; color: var(--text); cursor: pointer; margin-bottom: 10px; text-align: left; font-size: 16px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: var(--card-bg); padding: 25px; border-radius: 24px; width: 90%; max-width: 350px; }
+        .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-btns button { flex: 1; padding: 12px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-confirm { background: #4285f4; color: white; }
+        .btn-cancel { background: #eee; color: #333; }
+        .btn-del-confirm { background: var(--danger); color: white; }
     </style>
 </head>
 <body>
@@ -23,55 +28,96 @@
         <button class="btn-action" id="btnPass" style="display:none;">Change Password</button>
         <button class="btn-action" id="btnTheme">Change Theme 🌓</button>
         <button class="btn-action" id="btnLang">Change Language 🌐</button>
-        <button class="btn-action" id="btnLogout">Logout</button>
-        <button class="btn-action" style="color:var(--danger); border-color:var(--danger);" id="btnDelete">Delete Account</button>
+        <button class="btn-action" id="btnShowLogout">Logout</button>
+        <button class="btn-action" style="color:var(--danger); border-color:var(--danger);" id="btnShowDelete">Delete Account</button>
     </div>
 
     <div class="modal" id="modalLang">
         <div class="modal-content">
-            <h3 id="txtChooseLang">Choose Language</h3>
+            <h3 id="txtTitleLang">Language</h3>
             <label style="display:block; padding:10px;"><input type="radio" name="lang" value="en"> English</label>
             <label style="display:block; padding:10px;"><input type="radio" name="lang" value="fr"> Français</label>
-            <button onclick="saveLang()" style="width:100%; padding:10px; margin-top:10px; background:#4285f4; color:white; border:none; border-radius:10px;">OK</button>
+            <button id="confirmLang" class="btn-confirm" style="width:100%; padding:10px; margin-top:10px; border:none; border-radius:10px;">OK</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modalLogout">
+        <div class="modal-content">
+            <h3 id="txtTitleLogout">Logout?</h3>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeModals()">No</button>
+                <button class="btn-confirm" id="confirmLogout">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalDelete">
+        <div class="modal-content">
+            <h3 id="txtTitleDelete" style="color:var(--danger)">Delete Account?</h3>
+            <p id="txtDescDelete" style="font-size:14px; margin-top:10px;">This action is permanent.</p>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+                <button class="btn-del-confirm" id="confirmDelete">Delete</button>
+            </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, sendPasswordResetEmail, deleteUser } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", authDomain: "tchitchat-ia.firebaseapp.com", projectId: "tchitchat-ia", storageBucket: "tchitchat-ia.firebasestorage.app", messagingSenderId: "784697397736", appId: "1:784697397736:web:55295804d84feafda7945d" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const lang = localStorage.getItem('lang');
 
         onAuthStateChanged(auth, (user) => {
             if (!user) window.location.href = "../login/";
-            else {
-                document.getElementById('userEmail').innerText = user.email;
-                if (user.providerData.some(p => p.providerId === 'password')) document.getElementById('btnPass').style.display = 'block';
-            }
+            else document.getElementById('userEmail').innerText = user.email;
+            if (user && user.providerData.some(p => p.providerId === 'password')) document.getElementById('btnPass').style.display = 'block';
         });
 
-        // Appliquer Thème
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+        
+        // Traduction page compte
+        if(lang === 'fr'){
+            document.getElementById('btnPass').innerText = "Changer le mot de passe";
+            document.getElementById('btnTheme').innerText = "Changer le thème 🌓";
+            document.getElementById('btnLang').innerText = "Changer la langue 🌐";
+            document.getElementById('btnShowLogout').innerText = "Se déconnecter";
+            document.getElementById('btnShowDelete').innerText = "Supprimer le compte";
+            document.getElementById('txtTitleLogout').innerText = "Se déconnecter ?";
+            document.getElementById('txtTitleDelete').innerText = "Supprimer le compte ?";
+            document.getElementById('txtDescDelete').innerText = "Cette action est irréversible.";
+        }
+
+        window.closeModals = () => document.querySelectorAll('.modal').forEach(m => m.style.display='none');
+
         document.getElementById('btnTheme').onclick = () => {
             const target = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', target);
             localStorage.setItem('theme', target);
         };
 
-        // Langue
         document.getElementById('btnLang').onclick = () => {
             document.getElementById('modalLang').style.display = 'flex';
-            document.querySelector(`input[value="${localStorage.getItem('lang') || 'en'}"]`).checked = true;
+            document.querySelector(`input[value="${lang}"]`).checked = true;
         };
 
-        window.saveLang = () => {
+        document.getElementById('confirmLang').onclick = () => {
             localStorage.setItem('lang', document.querySelector('input[name="lang"]:checked').value);
             location.reload();
         };
 
-        document.getElementById('btnLogout').onclick = () => signOut(auth);
+        document.getElementById('btnShowLogout').onclick = () => document.getElementById('modalLogout').style.display = 'flex';
+        document.getElementById('confirmLogout').onclick = () => signOut(auth);
+
+        document.getElementById('btnShowDelete').onclick = () => document.getElementById('modalDelete').style.display = 'flex';
+        document.getElementById('confirmDelete').onclick = () => {
+            deleteUser(auth.currentUser).then(() => window.location.href="../")
+            .catch(() => { alert("Re-login required for security."); signOut(auth); });
+        };
+
         document.getElementById('btnPass').onclick = () => sendPasswordResetEmail(auth, auth.currentUser.email).then(() => alert("Email sent!"));
     </script>
 </body>
