@@ -14,17 +14,23 @@
         .sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background-color: var(--bg); z-index: 1000; transition: 0.3s; padding: 20px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
         .sidebar.active { left: 0; }
         
-        .sidebar-brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: bold; margin-bottom: 30px; }
+        .sidebar-brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
         .brand-logo { width: 32px; height: 32px; border-radius: 6px; }
         .brand-text { background: linear-gradient(90deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .btn-new-chat { background-color: #4285f4; color: white !important; border: none; border-radius: 12px; padding: 12px; width: 100%; margin-bottom: 25px; cursor: pointer; font-weight: 600; font-size: 15px; }
+        /* Style du bouton Nouveau Chat (Redirige vers l'accueil) */
+        .btn-new-chat { background-color: #4285f4; color: white !important; border: none; border-radius: 12px; padding: 12px; width: 100%; margin-bottom: 15px; cursor: pointer; font-weight: 600; text-align: center; text-decoration: none; display: block; }
+
+        /* Liste des discussions dans la sidebar */
+        .history-label { font-size: 12px; font-weight: bold; color: #70757a; margin: 10px 0; text-transform: uppercase; }
+        #chatList { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; }
+        .chat-item { padding: 10px; border-radius: 8px; font-size: 14px; cursor: pointer; color: var(--text); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid transparent; }
+        .chat-item:hover { background: var(--border); }
 
         .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding-top: 20px; border-top: 1px solid var(--border); }
         .btn-auth { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #4285f4; background: transparent; color: #4285f4; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; font-size: 14px; }
         .btn-signup { background-color: #4285f4; color: white; }
         .btn-menu-item { width: 100%; padding: 12px; background: transparent; border: none; text-align: left; color: var(--text); text-decoration: none; font-size: 15px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
-        .account-icon { width: 20px; height: 20px; }
 
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100%; width: 100%; }
         header { padding: 10px 15px; }
@@ -52,19 +58,25 @@
             <img src="logo.png" class="brand-logo">
             <span class="brand-text">TchitChat</span>
         </div>
-        <button class="btn-new-chat" id="txtNewChat">+ New Chat</button>
+        
+        <a href="index.html" class="btn-new-chat" id="txtNewChat">+ Nouveau Chat</a>
+        
+        <div class="history-label" id="txtHistory">Discussions</div>
+        <div id="chatList">
+            </div>
+
         <div class="sidebar-footer" id="sidebarFooter"></div>
     </aside>
 
     <main class="main-content">
         <header><div class="menu-toggle" id="menuBtn"><img src="menu.png"></div></header>
         <div class="chat-area">
-            <h1 class="gradient-text" id="txtWelcome">Welcome</h1>
-            <h1 class="subtitle" id="txtSubtitle">On TchitChat</h1>
+            <h1 class="gradient-text" id="txtWelcome">Bienvenue</h1>
+            <h1 class="subtitle" id="txtSubtitle">Sur TchitChat</h1>
         </div>
         <div class="bottom-container">
             <div class="input-box">
-                <input type="text" id="userInput" placeholder="Write to TchitChat...">
+                <input type="text" id="userInput" placeholder="Écrivez à TchitChat...">
                 <div class="send-btn" id="sendBtn"><img src="send.png"></div>
             </div>
         </div>
@@ -73,52 +85,70 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", authDomain: "tchitchat-ia.firebaseapp.com", projectId: "tchitchat-ia", storageBucket: "tchitchat-ia.firebasestorage.app", messagingSenderId: "784697397736", appId: "1:784697397736:web:55295804d84feafda7945d" };
-        initializeApp(firebaseConfig);
-        const auth = getAuth();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        if(!localStorage.getItem('lang')) {
-            localStorage.setItem('lang', navigator.language.startsWith('fr') ? 'fr' : 'en');
+        // Langue et Thème
+        const lang = localStorage.getItem('lang') || 'fr';
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+
+        // Traduction rapide
+        if(lang === 'en') {
+            document.getElementById('txtWelcome').innerText = "Welcome";
+            document.getElementById('txtSubtitle').innerText = "On TchitChat";
+            document.getElementById('userInput').placeholder = "Write to TchitChat...";
+            document.getElementById('txtNewChat').innerText = "+ New Chat";
+            document.getElementById('txtHistory').innerText = "Recent Chats";
         }
 
-        const translations = {
-            en: { welcome: "Welcome", subtitle: "On TchitChat", placeholder: "Write to TchitChat...", newChat: "+ New Chat", account: "Account", login: "Login", signup: "Sign Up" },
-            fr: { welcome: "Bienvenue", subtitle: "Sur TchitChat", placeholder: "Écrivez à TchitChat...", newChat: "+ Nouveau Chat", account: "Compte", login: "Connexion", signup: "Inscription" }
-        };
-
-        function updateUI() {
-            const lang = localStorage.getItem('lang');
-            const t = translations[lang];
-            document.getElementById('txtWelcome').innerText = t.welcome;
-            document.getElementById('txtSubtitle').innerText = t.subtitle;
-            document.getElementById('userInput').placeholder = t.placeholder;
-            document.getElementById('txtNewChat').innerText = t.newChat;
-            document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+        // --- CHARGEMENT DES DISCUSSIONS DANS LE MENU ---
+        function loadChatHistory() {
+            const q = query(collection(db, "chats"), orderBy("lastUpdate", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const chatList = document.getElementById('chatList');
+                chatList.innerHTML = '';
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const item = document.createElement('a');
+                    item.className = 'chat-item';
+                    item.href = `chat/?id=${doc.id}`;
+                    // On affiche le premier message comme titre
+                    item.innerText = data.messages[0]?.text || "Chat " + doc.id;
+                    chatList.appendChild(item);
+                });
+            });
         }
 
+        // --- LOGIQUE D'ENVOI (Génère l'ID uniquement ici) ---
+        function handleStartChat() {
+            const msg = document.getElementById('userInput').value.trim();
+            if(!msg) return;
+
+            // Génère un ID aléatoire
+            const id = Math.random().toString(36).substring(2, 10);
+            // Redirige vers la page chat avec le message initial
+            window.location.href = `chat/?id=${id}&msg=${encodeURIComponent(msg)}`;
+        }
+
+        document.getElementById('sendBtn').onclick = handleStartChat;
+        document.getElementById('userInput').onkeypress = (e) => { if(e.key === 'Enter') handleStartChat(); };
+
+        // Auth
         onAuthStateChanged(auth, (user) => {
-            const t = translations[localStorage.getItem('lang')];
             const footer = document.getElementById('sidebarFooter');
             if (user) {
-                footer.innerHTML = `<a href="account/" class="btn-menu-item"><img src="logo.png" class="account-icon"><span>${t.account}</span></a>`;
+                footer.innerHTML = `<a href="account/" class="btn-menu-item"><img src="logo.png" style="width:20px"><span>Compte</span></a>`;
+                loadChatHistory();
             } else {
-                footer.innerHTML = `<a href="login/" class="btn-auth">${t.login}</a><a href="signup/" class="btn-auth btn-signup">${t.signup}</a>`;
+                footer.innerHTML = `<a href="login/" class="btn-auth">Connexion</a><a href="signup/" class="btn-auth btn-signup">Inscription</a>`;
             }
         });
 
-        // GENERATION DE CHAT
-        document.getElementById('txtNewChat').onclick = () => {
-            const id = Math.random().toString(36).substring(2, 10);
-            window.location.href = `chat.html?id=${id}`;
-        };
-
-        document.getElementById('sendBtn').onclick = () => {
-            const id = Math.random().toString(36).substring(2, 10);
-            window.location.href = `chat.html?id=${id}&msg=${encodeURIComponent(document.getElementById('userInput').value)}`;
-        };
-
-        updateUI();
+        // Menu Toggle
         document.getElementById('menuBtn').onclick = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); };
         document.getElementById('overlay').onclick = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); };
     </script>
