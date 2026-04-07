@@ -1,156 +1,45 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Connexion - TchitChat</title>
-    <link rel="icon" type="image/x-icon" href="../tchitchat.ico">
+    <title>Login - TchitChat</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background-color: #f8fbff; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100dvh; 
-        }
-        .auth-card { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 28px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
-            width: 90%; 
-            max-width: 400px; 
-            text-align: center; 
-        }
-        .logo { width: 50px; margin-bottom: 10px; }
-        h1 { font-size: 22px; margin-bottom: 20px; color: #1f1f1f; }
-
-        .social-btn { 
-            width: 100%; 
-            padding: 12px; 
-            margin-bottom: 10px; 
-            border-radius: 12px; 
-            border: 1px solid #dce1e7; 
-            background: white; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 10px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            font-size: 14px; 
-            transition: 0.2s;
-        }
-        .social-btn:hover { background-color: #f1f3f4; }
-        .social-btn img { width: 20px; }
-
-        .divider { 
-            margin: 20px 0; 
-            display: flex; 
-            align-items: center; 
-            color: #70757a; 
-            font-size: 12px; 
-        }
-        .divider::before, .divider::after { 
-            content: ""; 
-            flex: 1; 
-            height: 1px; 
-            background: #dce1e7; 
-            margin: 0 10px; 
-        }
-
-        input { 
-            width: 100%; 
-            padding: 14px; 
-            margin-bottom: 10px; 
-            border-radius: 12px; 
-            border: 1px solid #dce1e7; 
-            outline: none; 
-            font-size: 16px; 
-        }
-        input:focus { border-color: #4285f4; }
-
-        .btn-primary { 
-            width: 100%; 
-            padding: 14px; 
-            background: #4285f4; 
-            color: white; 
-            border: none; 
-            border-radius: 12px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            font-size: 16px; 
-            margin-top: 10px; 
-        }
-        
-        .footer-link { margin-top: 20px; font-size: 13px; color: #5f6368; }
-        .footer-link a { color: #4285f4; text-decoration: none; font-weight: bold; }
+        :root { --bg: #f8fbff; --card-bg: white; --text: #1f1f1f; --border: #dce1e7; }
+        [data-theme="dark"] { --bg: #131314; --card-bg: #1e1e20; --text: #e3e3e3; --border: #444746; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100dvh; }
+        .auth-card { background: var(--card-bg); padding: 30px; border-radius: 28px; width: 90%; max-width: 400px; text-align: center; border: 1px solid var(--border); }
+        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--border); background: transparent; color: var(--text); }
+        .btn-primary { width: 100%; padding: 14px; background: #4285f4; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; }
     </style>
 </head>
 <body>
-
-<div class="auth-card">
-    <img src="../logo.png" alt="Logo" class="logo">
-    <h1>Bon retour !</h1>
-
-    <button class="social-btn" id="googleBtn">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"> Continuer avec Google
-    </button>
-
-    <div class="divider">ou utiliser votre email</div>
-
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Mot de passe" required>
-    <button class="btn-primary" id="loginBtn">Se connecter</button>
-
-    <div class="footer-link">
-        Nouveau ici ? <a href="../signup/">Créer un compte</a>
+    <div class="auth-card">
+        <h1 id="txtTitle">Login</h1>
+        <button id="googleBtn" style="width:100%; padding:12px; margin-bottom:10px; cursor:pointer;">Google</button>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button class="btn-primary" id="loginBtn">Go</button>
+        <p style="margin-top:20px;"><a href="../signup/" id="txtLink" style="color:#4285f4; text-decoration:none;">No account? Sign Up</a></p>
     </div>
-</div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        
+        const firebaseConfig = { apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", authDomain: "tchitchat-ia.firebaseapp.com", projectId: "tchitchat-ia", storageBucket: "tchitchat-ia.firebasestorage.app", messagingSenderId: "784697397736", appId: "1:784697397736:web:55295804d84feafda7945d" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-  // Ta configuration Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o",
-    authDomain: "tchitchat-ia.firebaseapp.com",
-    projectId: "tchitchat-ia",
-    storageBucket: "tchitchat-ia.firebasestorage.app",
-    messagingSenderId: "784697397736",
-    appId: "1:784697397736:web:55295804d84feafda7945d"
-  };
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+        const lang = localStorage.getItem('lang') || 'en';
+        if(lang === 'fr') {
+            document.getElementById('txtTitle').innerText = "Connexion";
+            document.getElementById('txtLink').innerText = "Pas de compte ? S'inscrire";
+        }
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  // Login avec Google
-  document.getElementById('googleBtn').onclick = () => {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
-      .then(() => window.location.href="../")
-      .catch((error) => alert("Erreur Google : " + error.message));
-  };
-
-  // Login avec Email/Pass
-  document.getElementById('loginBtn').onclick = () => {
-    const email = document.getElementById('email').value;
-    const pass = document.getElementById('password').value;
-    
-    if(!email || !pass) return alert("Veuillez remplir tous les champs.");
-
-    signInWithEmailAndPassword(auth, email, pass)
-      .then(() => window.location.href="../")
-      .catch((error) => {
-        let message = "Erreur de connexion.";
-        if(error.code === 'auth/invalid-credential') message = "Email ou mot de passe incorrect.";
-        alert(message);
-      });
-  };
-</script>
-
+        document.getElementById('googleBtn').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).then(() => window.location.href="../");
+        document.getElementById('loginBtn').onclick = () => signInWithEmailAndPassword(auth, email.value, password.value).then(() => window.location.href="../");
+    </script>
 </body>
 </html>
