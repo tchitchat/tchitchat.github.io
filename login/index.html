@@ -9,37 +9,34 @@
         [data-theme="dark"] { --bg: #131314; --card-bg: #1e1e20; --text: #e3e3e3; --border: #444746; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100dvh; }
         .auth-card { background: var(--card-bg); padding: 30px; border-radius: 28px; width: 90%; max-width: 400px; text-align: center; border: 1px solid var(--border); }
-        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--border); background: transparent; color: var(--text); }
+        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--border); background: transparent; color: var(--text); outline:none; }
         .btn-primary { width: 100%; padding: 14px; background: #4285f4; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; }
     </style>
 </head>
 <body>
     <div class="auth-card">
         <h1 id="txtTitle">Login</h1>
-        <button id="googleBtn" style="width:100%; padding:12px; margin-bottom:10px; cursor:pointer;">Google</button>
+        <button id="googleBtn" style="width:100%; padding:12px; margin:15px 0; cursor:pointer; border-radius:10px; border:1px solid #ccc; background:white;">Google</button>
         <input type="email" id="email" placeholder="Email">
         <input type="password" id="password" placeholder="Password">
-        <button class="btn-primary" id="loginBtn">Go</button>
+        <button class="btn-primary" id="loginBtn">Login</button>
         <p style="margin-top:20px;"><a href="../signup/" id="txtLink" style="color:#4285f4; text-decoration:none;">No account? Sign Up</a></p>
     </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        
         const firebaseConfig = { apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", authDomain: "tchitchat-ia.firebaseapp.com", projectId: "tchitchat-ia", storageBucket: "tchitchat-ia.firebasestorage.app", messagingSenderId: "784697397736", appId: "1:784697397736:web:55295804d84feafda7945d" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
-        const lang = localStorage.getItem('lang') || 'en';
+        const lang = localStorage.getItem('lang') || (navigator.language.startsWith('fr') ? 'fr' : 'en');
         if(lang === 'fr') {
             document.getElementById('txtTitle').innerText = "Connexion";
             document.getElementById('txtLink').innerText = "Pas de compte ? S'inscrire";
+            document.getElementById('loginBtn').innerText = "Se connecter";
         }
-
         document.getElementById('googleBtn').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).then(() => window.location.href="../");
-        document.getElementById('loginBtn').onclick = () => signInWithEmailAndPassword(auth, email.value, password.value).then(() => window.location.href="../");
+        document.getElementById('loginBtn').onclick = () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value).then(() => window.location.href="../").catch(e => alert(e.message));
     </script>
 </body>
 </html>
