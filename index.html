@@ -11,53 +11,24 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); display: flex; height: 100dvh; overflow: hidden; }
 
-        /* SIDEBAR */
         .sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background-color: var(--bg); z-index: 1000; transition: 0.3s; padding: 20px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
         .sidebar.active { left: 0; }
         
-        .sidebar-brand { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            font-size: 20px; 
-            font-weight: bold; 
-            margin-bottom: 30px;
-        }
+        .sidebar-brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: bold; margin-bottom: 30px; }
         .brand-logo { width: 32px; height: 32px; border-radius: 6px; }
         .brand-text { background: linear-gradient(90deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .btn-new-chat { background-color: #4285f4; color: white; border: none; border-radius: 12px; padding: 12px; width: 100%; margin-bottom: 25px; cursor: pointer; font-weight: 600; font-size: 15px; }
+        .btn-new-chat { background-color: #4285f4; color: white !important; border: none; border-radius: 12px; padding: 12px; width: 100%; margin-bottom: 25px; cursor: pointer; font-weight: 600; font-size: 15px; }
 
         .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding-top: 20px; border-top: 1px solid var(--border); }
-        
-        /* Boutons Auth */
         .btn-auth { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #4285f4; background: transparent; color: #4285f4; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; font-size: 14px; }
         .btn-signup { background-color: #4285f4; color: white; }
+        .btn-menu-item { width: 100%; padding: 12px; background: transparent; border: none; text-align: left; color: var(--text); text-decoration: none; font-size: 15px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+        .account-icon { width: 20px; height: 20px; }
 
-        /* Bouton Compte avec Icône */
-        .btn-menu-item { 
-            width: 100%; 
-            padding: 12px; 
-            background: transparent; 
-            border: none; 
-            text-align: left; 
-            color: var(--text); 
-            text-decoration: none; 
-            font-size: 15px; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px;
-        }
-        .btn-menu-item:hover { background: var(--border); }
-        .account-icon { width: 20px; height: 20px; opacity: 0.8; }
-        [data-theme="dark"] .account-icon { filter: invert(1); }
-
-        /* MAIN CONTENT */
-        .main-content { flex: 1; display: flex; flex-direction: column; height: 100%; width: 100%; justify-content: space-between; }
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100%; width: 100%; }
         header { padding: 10px 15px; }
-        .menu-toggle { width: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 40px; }
+        .menu-toggle { width: 40px; cursor: pointer; height: 40px; display: flex; align-items: center; }
         .menu-toggle img { width: 24px; }
 
         .chat-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
@@ -65,7 +36,6 @@
         .gradient-text { background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .subtitle { color: #c4c7c5; }
 
-        /* BARRE DE CHAT (BASSE) */
         .bottom-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px 15px 20px 15px; } 
         .input-box { background: var(--card-bg); border-radius: 28px; display: flex; align-items: center; padding: 5px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid var(--border); }
         .input-box input { flex: 1; border: none; outline: none; font-size: 16px; padding: 12px 0; background: transparent; color: var(--text); }
@@ -77,37 +47,25 @@
 </head>
 <body>
     <div class="overlay" id="overlay"></div>
-    
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
-            <img src="logo.png" alt="Logo" class="brand-logo">
+            <img src="logo.png" class="brand-logo">
             <span class="brand-text">TchitChat</span>
         </div>
-        
         <button class="btn-new-chat" id="txtNewChat">+ New Chat</button>
-        
-        <div class="sidebar-footer" id="sidebarFooter">
-            </div>
+        <div class="sidebar-footer" id="sidebarFooter"></div>
     </aside>
 
     <main class="main-content">
-        <header>
-            <div class="menu-toggle" id="menuBtn">
-                <img src="menu.png" alt="Menu">
-            </div>
-        </header>
-
+        <header><div class="menu-toggle" id="menuBtn"><img src="menu.png"></div></header>
         <div class="chat-area">
             <h1 class="gradient-text" id="txtWelcome">Welcome</h1>
             <h1 class="subtitle" id="txtSubtitle">On TchitChat</h1>
         </div>
-
         <div class="bottom-container">
             <div class="input-box">
                 <input type="text" id="userInput" placeholder="Write to TchitChat...">
-                <div class="send-btn">
-                    <img src="send.png" alt="Send">
-                </div>
+                <div class="send-btn" id="sendBtn"><img src="send.png"></div>
             </div>
         </div>
     </main>
@@ -116,72 +74,53 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-        const firebaseConfig = { 
-            apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", 
-            authDomain: "tchitchat-ia.firebaseapp.com", 
-            projectId: "tchitchat-ia", 
-            storageBucket: "tchitchat-ia.firebasestorage.app", 
-            messagingSenderId: "784697397736", 
-            appId: "1:784697397736:web:55295804d84feafda7945d" 
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+        const firebaseConfig = { apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", authDomain: "tchitchat-ia.firebaseapp.com", projectId: "tchitchat-ia", storageBucket: "tchitchat-ia.firebasestorage.app", messagingSenderId: "784697397736", appId: "1:784697397736:web:55295804d84feafda7945d" };
+        initializeApp(firebaseConfig);
+        const auth = getAuth();
 
-        // Détection auto de la langue
         if(!localStorage.getItem('lang')) {
-            const userLang = navigator.language || navigator.userLanguage;
-            localStorage.setItem('lang', userLang.startsWith('fr') ? 'fr' : 'en');
+            localStorage.setItem('lang', navigator.language.startsWith('fr') ? 'fr' : 'en');
         }
 
         const translations = {
-            en: { welcome: "Welcome", subtitle: "On TchitChat", placeholder: "Write to TchitChat...", newChat: "+ New Chat", login: "Login", signup: "Sign Up", account: "Account" },
-            fr: { welcome: "Bienvenue", subtitle: "Sur TchitChat", placeholder: "Écrivez à TchitChat...", newChat: "+ Nouveau Chat", login: "Connexion", signup: "Inscription", account: "Compte" }
+            en: { welcome: "Welcome", subtitle: "On TchitChat", placeholder: "Write to TchitChat...", newChat: "+ New Chat", account: "Account", login: "Login", signup: "Sign Up" },
+            fr: { welcome: "Bienvenue", subtitle: "Sur TchitChat", placeholder: "Écrivez à TchitChat...", newChat: "+ Nouveau Chat", account: "Compte", login: "Connexion", signup: "Inscription" }
         };
 
         function updateUI() {
             const lang = localStorage.getItem('lang');
             const t = translations[lang];
-            
             document.getElementById('txtWelcome').innerText = t.welcome;
             document.getElementById('txtSubtitle').innerText = t.subtitle;
             document.getElementById('userInput').placeholder = t.placeholder;
             document.getElementById('txtNewChat').innerText = t.newChat;
-            
             document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
         }
 
         onAuthStateChanged(auth, (user) => {
-            const lang = localStorage.getItem('lang');
-            const t = translations[lang];
+            const t = translations[localStorage.getItem('lang')];
             const footer = document.getElementById('sidebarFooter');
-            
             if (user) {
-                // Version avec icône pour le compte (utilise le logo ou une icône de profil)
-                footer.innerHTML = `
-                    <a href="account/" class="btn-menu-item">
-                        <img src="logo.png" class="account-icon">
-                        <span>${t.account}</span>
-                    </a>
-                `;
+                footer.innerHTML = `<a href="account/" class="btn-menu-item"><img src="logo.png" class="account-icon"><span>${t.account}</span></a>`;
             } else {
-                footer.innerHTML = `
-                    <a href="login/" class="btn-auth">${t.login}</a>
-                    <a href="signup/" class="btn-auth btn-signup">${t.signup}</a>
-                `;
+                footer.innerHTML = `<a href="login/" class="btn-auth">${t.login}</a><a href="signup/" class="btn-auth btn-signup">${t.signup}</a>`;
             }
         });
 
-        updateUI();
+        // GENERATION DE CHAT
+        document.getElementById('txtNewChat').onclick = () => {
+            const id = Math.random().toString(36).substring(2, 10);
+            window.location.href = `chat.html?id=${id}`;
+        };
 
-        // Menu Toggle
-        document.getElementById('menuBtn').onclick = () => {
-            document.getElementById('sidebar').classList.add('active');
-            document.getElementById('overlay').classList.add('active');
+        document.getElementById('sendBtn').onclick = () => {
+            const id = Math.random().toString(36).substring(2, 10);
+            window.location.href = `chat.html?id=${id}&msg=${encodeURIComponent(document.getElementById('userInput').value)}`;
         };
-        document.getElementById('overlay').onclick = () => {
-            document.getElementById('sidebar').classList.remove('active');
-            document.getElementById('overlay').classList.remove('active');
-        };
+
+        updateUI();
+        document.getElementById('menuBtn').onclick = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); };
+        document.getElementById('overlay').onclick = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); };
     </script>
 </body>
 </html>
