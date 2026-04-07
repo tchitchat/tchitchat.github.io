@@ -1,51 +1,40 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>TchitChat</title>
     <link rel="icon" type="image/x-icon" href="tchitchat.ico">
     <style>
+        :root { --bg: #f8fbff; --card-bg: white; --text: #1f1f1f; --border: #e1e4e8; }
+        [data-theme="dark"] { --bg: #131314; --card-bg: #1e1e20; --text: #e3e3e3; --border: #444746; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fbff; display: flex; height: 100dvh; overflow: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); display: flex; height: 100dvh; overflow: hidden; }
 
-        /* --- SIDEBAR --- */
-        .sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background-color: #f0f4f9; z-index: 1000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; border-right: 1px solid #dce1e7; display: flex; flex-direction: column; }
+        .sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background-color: var(--bg); z-index: 1000; transition: 0.3s; padding: 20px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
         .sidebar.active { left: 0; }
-        .sidebar-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .sidebar-logo { width: 30px; }
         .sidebar-brand { font-size: 20px; font-weight: bold; background: linear-gradient(90deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .btn-new-chat { background-color: #4285f4; color: white; border: none; border-radius: 12px; padding: 12px; font-weight: 600; width: 100%; text-align: left; margin-bottom: 25px; cursor: pointer; }
+        .btn-new-chat { background-color: #4285f4; color: white; border: none; border-radius: 12px; padding: 12px; width: 100%; margin-bottom: 25px; cursor: pointer; font-weight: 600; }
 
-        /* --- FOOTER MENU --- */
-        .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 5px; padding-top: 20px; border-top: 1px solid #dce1e7; }
-        .btn-auth { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #4285f4; background: transparent; color: #4285f4; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; font-size: 14px; margin-bottom: 5px; }
+        .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 5px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .btn-auth { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #4285f4; background: transparent; color: #4285f4; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; font-size: 14px; }
         .btn-signup { background-color: #4285f4; color: white; }
-        
-        .btn-menu-item { width: 100%; padding: 12px; background: transparent; border: none; text-align: left; display: block; color: #1f1f1f; text-decoration: none; font-size: 15px; border-radius: 10px; cursor: pointer; }
-        .btn-menu-item:hover { background: #e2e7ed; }
+        .btn-menu-item { width: 100%; padding: 12px; background: transparent; border: none; text-align: left; color: var(--text); text-decoration: none; font-size: 15px; border-radius: 10px; cursor: pointer; }
 
-        /* --- MAIN CONTENT --- */
-        .main-content { flex: 1; display: flex; flex-direction: column; height: 100%; width: 100%; position: relative; justify-content: space-between; }
-        header { padding: 10px 15px; flex-shrink: 0; }
-        .menu-toggle { width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; }
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100%; width: 100%; justify-content: space-between; }
+        header { padding: 10px 15px; }
+        .menu-toggle { width: 40px; cursor: pointer; }
         .menu-toggle img { width: 24px; }
 
-        .chat-area { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 10px 20px; justify-content: center; }
-        .hero-text h1 { font-size: clamp(28px, 7vw, 48px); line-height: 1.2; text-align: center;}
+        .chat-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .hero-text h1 { font-size: clamp(28px, 7vw, 48px); text-align: center; }
         .gradient-text { background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { color: #c4c7c5; text-align: center; }
+        .subtitle { color: #c4c7c5; }
 
-        .suggestions { display: flex; gap: 12px; width: 100%; max-width: 800px; margin-top: 20px; overflow-x: auto; padding: 10px 5px; scrollbar-width: none; }
-        .card { min-width: 150px; background: white; padding: 15px; border-radius: 16px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); flex-shrink: 0; cursor: pointer; }
-
-        /* --- BARRE DE CHAT POSITIONNÉE PLUS BAS (40px) --- */
-        .bottom-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px 15px 40px 15px; background-color: #f8fbff; flex-shrink: 0; }
-        .input-box { background: white; border-radius: 28px; display: flex; align-items: center; padding: 5px 10px 5px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid #e1e4e8; }
-        .input-box input { flex: 1; border: none; outline: none; font-size: 16px; padding: 12px 0; background: transparent; }
-        .send-btn { width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .send-btn img { width: 100%; }
-        .disclaimer { font-size: 10px; color: #70757a; margin-top: 8px; text-align: center; }
+        .bottom-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px 15px 20px 15px; } /* BARRE TOUT EN BAS */
+        .input-box { background: var(--card-bg); border-radius: 28px; display: flex; align-items: center; padding: 5px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid var(--border); }
+        .input-box input { flex: 1; border: none; outline: none; font-size: 16px; padding: 12px 0; background: transparent; color: var(--text); }
+        .send-btn img { width: 30px; cursor: pointer; }
 
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 999; }
         .overlay.active { display: block; }
@@ -54,33 +43,22 @@
 <body>
     <div class="overlay" id="overlay"></div>
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <img src="logo.png" alt="Logo" class="sidebar-logo">
-            <span class="sidebar-brand">TchitChat</span>
-        </div>
-        <button class="btn-new-chat" onclick="location.reload()">+ Nouveau chat</button>
+        <div class="sidebar-header"><span class="sidebar-brand">TchitChat</span></div>
+        <button class="btn-new-chat" id="txtNewChat">+ New Chat</button>
         <div class="sidebar-footer" id="sidebarFooter"></div>
     </aside>
 
     <main class="main-content">
-        <header><div class="menu-toggle" id="menuBtn"><img src="menu.png" alt="Menu"></div></header>
+        <header><div class="menu-toggle" id="menuBtn"><img src="menu.png"></div></header>
         <div class="chat-area">
-            <div class="hero-text">
-                <h1><span class="gradient-text">Bienvenue</span></h1>
-                <h1 class="subtitle">Sur TchitChat</h1>
-            </div>
-            <section class="suggestions">
-                <div class="card" onclick="fillInput('Rédige une blague')">Blague 🎭</div>
-                <div class="card" onclick="fillInput('Idée de cadeau')">Cadeau 🎁</div>
-                <div class="card" onclick="fillInput('Recette simple')">Recette 🍝</div>
-            </section>
+            <h1 class="gradient-text" id="txtWelcome">Welcome</h1>
+            <h1 class="subtitle" id="txtSubtitle">On TchitChat</h1>
         </div>
         <div class="bottom-container">
             <div class="input-box">
-                <input type="text" id="userInput" placeholder="Ecrivez à TchitChat...">
-                <div class="send-btn" id="sendBtn"><img src="send.png" alt="Envoyer"></div>
+                <input type="text" id="userInput" placeholder="Write to TchitChat...">
+                <div class="send-btn"><img src="send.png"></div>
             </div>
-            <p class="disclaimer">TchitChat peut faire des erreurs.</p>
         </div>
     </main>
 
@@ -88,43 +66,39 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o",
-            authDomain: "tchitchat-ia.firebaseapp.com",
-            projectId: "tchitchat-ia",
-            storageBucket: "tchitchat-ia.firebasestorage.app",
-            messagingSenderId: "784697397736",
-            appId: "1:784697397736:web:55295804d84feafda7945d"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", authDomain: "tchitchat-ia.firebaseapp.com", projectId: "tchitchat-ia", storageBucket: "tchitchat-ia.firebasestorage.app", messagingSenderId: "784697397736", appId: "1:784697397736:web:55295804d84feafda7945d" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        const sidebar = document.getElementById('sidebar'), menuBtn = document.getElementById('menuBtn'), 
-              overlay = document.getElementById('overlay'), footer = document.getElementById('sidebarFooter'), 
-              userInput = document.getElementById('userInput');
+        const translations = {
+            en: { welcome: "Welcome", subtitle: "On TchitChat", placeholder: "Write to TchitChat...", newChat: "+ New Chat", login: "Login", signup: "Sign Up", account: "Account" },
+            fr: { welcome: "Bienvenue", subtitle: "Sur TchitChat", placeholder: "Écrivez à TchitChat...", newChat: "+ Nouveau Chat", login: "Connexion", signup: "Inscription", account: "Compte" }
+        };
+
+        function updateUI() {
+            const lang = localStorage.getItem('lang') || 'en';
+            const t = translations[lang];
+            document.getElementById('txtWelcome').innerText = t.welcome;
+            document.getElementById('txtSubtitle').innerText = t.subtitle;
+            document.getElementById('userInput').placeholder = t.placeholder;
+            document.getElementById('txtNewChat').innerText = t.newChat;
+            document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+        }
 
         onAuthStateChanged(auth, (user) => {
+            const lang = localStorage.getItem('lang') || 'en';
+            const t = translations[lang];
+            const footer = document.getElementById('sidebarFooter');
             if (user) {
-                // Uniquement le bouton Compte
-                footer.innerHTML = `
-                    <a href="account/" class="btn-menu-item">Compte</a>
-                `;
+                footer.innerHTML = `<a href="account/" class="btn-menu-item">${t.account}</a>`;
             } else {
-                footer.innerHTML = `
-                    <a href="login/" class="btn-auth">Se connecter</a>
-                    <a href="signup/" class="btn-auth btn-signup">Créer un compte</a>
-                `;
+                footer.innerHTML = `<a href="login/" class="btn-auth">${t.login}</a><a href="signup/" class="btn-auth btn-signup">${t.signup}</a>`;
             }
         });
 
-        menuBtn.onclick = () => { sidebar.classList.add('active'); overlay.classList.add('active'); };
-        overlay.onclick = () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); };
-        window.fillInput = (text) => { userInput.value = text; userInput.focus(); };
-
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', () => { document.body.style.height = window.visualViewport.height + 'px'; });
-        }
+        updateUI();
+        document.getElementById('menuBtn').onclick = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); };
+        document.getElementById('overlay').onclick = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); };
     </script>
 </body>
 </html>
