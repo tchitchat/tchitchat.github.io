@@ -31,7 +31,7 @@
         .gradient-text { background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .subtitle { color: #c4c7c5; }
 
-        .bottom-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px 15px 20px 15px; } /* BARRE TOUT EN BAS */
+        .bottom-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px 15px 20px 15px; } 
         .input-box { background: var(--card-bg); border-radius: 28px; display: flex; align-items: center; padding: 5px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid var(--border); }
         .input-box input { flex: 1; border: none; outline: none; font-size: 16px; padding: 12px 0; background: transparent; color: var(--text); }
         .send-btn img { width: 30px; cursor: pointer; }
@@ -70,13 +70,18 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        if(!localStorage.getItem('lang')) {
+            const userLang = navigator.language || navigator.userLanguage;
+            localStorage.setItem('lang', userLang.startsWith('fr') ? 'fr' : 'en');
+        }
+
         const translations = {
             en: { welcome: "Welcome", subtitle: "On TchitChat", placeholder: "Write to TchitChat...", newChat: "+ New Chat", login: "Login", signup: "Sign Up", account: "Account" },
             fr: { welcome: "Bienvenue", subtitle: "Sur TchitChat", placeholder: "Écrivez à TchitChat...", newChat: "+ Nouveau Chat", login: "Connexion", signup: "Inscription", account: "Compte" }
         };
 
         function updateUI() {
-            const lang = localStorage.getItem('lang') || 'en';
+            const lang = localStorage.getItem('lang');
             const t = translations[lang];
             document.getElementById('txtWelcome').innerText = t.welcome;
             document.getElementById('txtSubtitle').innerText = t.subtitle;
@@ -86,7 +91,7 @@
         }
 
         onAuthStateChanged(auth, (user) => {
-            const lang = localStorage.getItem('lang') || 'en';
+            const lang = localStorage.getItem('lang');
             const t = translations[lang];
             const footer = document.getElementById('sidebarFooter');
             if (user) {
