@@ -12,7 +12,7 @@
         
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); display: flex; height: 100dvh; overflow: hidden; width: 100vw; }
 
-        /* Sidebar - Mode Push (Pousse le contenu) */
+        /* Sidebar */
         .sidebar { flex: 0 0 280px; margin-left: -280px; height: 100%; background-color: var(--bg); z-index: 1000; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
         .sidebar.active { margin-left: 0; }
         
@@ -29,10 +29,20 @@
 
         /* Main Content */
         .main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100%; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        header { padding: 10px 15px; }
+        
+        /* Header modifié pour accueillir les boutons à droite */
+        header { padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
         .menu-toggle { width: 40px; cursor: pointer; height: 40px; display: flex; align-items: center; border-radius: 50%; padding: 8px; transition: background 0.2s;}
         .menu-toggle:hover { background: var(--border); }
         .menu-toggle img { width: 24px; }
+
+        /* Boutons header (Top Right) */
+        .header-auth-container { display: flex; gap: 10px; }
+        .btn-header { padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: 0.2s; }
+        .btn-login { background: transparent; color: var(--text); border: 1px solid var(--border); }
+        .btn-login:hover { background: var(--border); }
+        .btn-register { background: #4285f4; color: white; border: 1px solid #4285f4; }
+        .btn-register:hover { background: #3367d6; }
 
         .chat-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .gradient-text { background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: clamp(32px, 8vw, 48px); font-weight: bold; }
@@ -41,8 +51,6 @@
         /* Zone de saisie extensible */
         .bottom-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px 15px 30px 15px; } 
         .input-box { background: var(--card-bg); border-radius: 28px; display: flex; align-items: flex-end; padding: 8px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid var(--border); transition: all 0.3s ease; }
-        
-        /* Animation d'agrandissement au clic */
         .input-box:focus-within { border-radius: 16px; padding-bottom: 12px; border-color: #4285f4; }
         
         .input-box textarea { flex: 1; border: none; outline: none; font-size: 16px; padding: 8px 0; background: transparent; color: var(--text); resize: none; height: 40px; min-height: 40px; transition: height 0.3s ease; font-family: inherit; line-height: 1.5; }
@@ -54,8 +62,7 @@
 
         /* Sidebar Footer (Paramètres) */
         .sidebar-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border); }
-        .btn-auth { display: block; text-align: center; padding: 10px; background: #4285f4; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin-bottom: 5px; }
-        .btn-settings { width: 100%; padding: 10px 12px; background: transparent; border: none; color: var(--text); border-radius: 8px; cursor: pointer; text-align: left; font-size: 14px; font-weight: 500; display: flex; align-items: center; transition: background 0.2s; }
+        .btn-settings { width: 100%; padding: 10px 12px; background: transparent; border: none; color: var(--text); border-radius: 8px; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; transition: background 0.2s; }
         .btn-settings:hover { background: var(--border); }
         .btn-settings img { width: 18px; margin-right: 10px; opacity: 0.7; }
 
@@ -74,16 +81,21 @@
             <img src="logo.png" class="brand-logo" alt="Logo">
             <span class="brand-text">TchitChat</span>
         </div>
-        <a href="index.html" class="btn-new-chat">+ Nouveau Tchit</a>
+        <a href="./" class="btn-new-chat">+ Nouveau Tchit</a>
         <div class="history-label">Vos Tchits</div>
         <div id="chatList"></div>
         <div class="sidebar-footer" id="sidebarFooter">
-            <!-- Injecté par JS -->
+            <!-- Injecté par JS : Bouton Paramètres -->
         </div>
     </aside>
 
     <main class="main-content">
-        <header><div class="menu-toggle" id="menuBtn"><img src="menu.png" alt="Menu"></div></header>
+        <header>
+            <div class="menu-toggle" id="menuBtn"><img src="menu.png" alt="Menu"></div>
+            <div class="header-auth-container" id="headerAuth">
+                <!-- Injecté par JS : Boutons Inscription/Connexion -->
+            </div>
+        </header>
         <div class="chat-area">
             <h1 class="gradient-text">Bienvenue</h1>
             <h1 class="subtitle">Sur TchitChat</h1>
@@ -121,9 +133,24 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let tousLesTchits = []; // Stockage local pour la recherche
+        let tousLesTchits = [];
 
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+
+        // --- GESTION DU MENU (SAUVEGARDE LOCALSTORAGE) ---
+        const sidebar = document.getElementById('sidebar');
+        const menuBtn = document.getElementById('menuBtn');
+
+        // Au chargement, on vérifie l'état sauvegardé
+        if (localStorage.getItem('sidebarOpen') === 'true') {
+            sidebar.classList.add('active');
+        }
+
+        // Au clic, on toggle et on sauvegarde le nouvel état
+        menuBtn.onclick = () => { 
+            sidebar.classList.toggle('active'); 
+            localStorage.setItem('sidebarOpen', sidebar.classList.contains('active'));
+        };
 
         // --- CHARGEMENT HISTORIQUE ---
         function loadHistory(user) {
@@ -131,11 +158,11 @@
             onSnapshot(q, (snapshot) => {
                 const list = document.getElementById('chatList');
                 list.innerHTML = "";
-                tousLesTchits = []; // On vide le tableau à chaque mise à jour
+                tousLesTchits = []; 
 
                 snapshot.forEach(doc => {
                     const texte = doc.data().messages[0]?.text || "Tchit " + doc.id;
-                    tousLesTchits.push({ id: doc.id, text: texte }); // Sauvegarde pour la recherche
+                    tousLesTchits.push({ id: doc.id, text: texte }); 
 
                     const item = document.createElement('a');
                     item.className = 'chat-item';
@@ -159,7 +186,6 @@
 
         document.getElementById('sendBtn').onclick = handleSend;
         
-        // Gestion de la touche "Entrée" dans le textarea (Maj+Entrée pour sauter une ligne)
         document.getElementById('userInput').addEventListener('keydown', (e) => { 
             if(e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -167,58 +193,54 @@
             }
         });
 
-        // --- AUTH & FOOTER MENU ---
+        // --- AUTH & GESTION DES BOUTONS (HEADER ET FOOTER) ---
         onAuthStateChanged(auth, (user) => {
             const footer = document.getElementById('sidebarFooter');
+            const headerAuth = document.getElementById('headerAuth');
+
             if (user) {
-                // On remplace le texte "Connecté" par le bouton Paramètres
+                // Connecté : Bouton paramètres dans le sidebar
                 footer.innerHTML = `
-                    <button class="btn-settings" id="btnSettings">
+                    <a href="./account/" class="btn-settings">
                         <img src="settings.png" alt="⚙️"> Paramètres
-                    </button>
+                    </a>
                 `;
-                
-                // Action temporaire pour le bouton paramètres
-                document.getElementById('btnSettings').onclick = () => alert("Le menu paramètres arrivera bientôt !");
+                // On vide le conteneur en haut à droite
+                headerAuth.innerHTML = ''; 
                 
                 loadHistory(user);
             } else {
-                footer.innerHTML = `<a href="./login/" class="btn-auth">Connexion</a>`;
+                // Déconnecté : Pas de paramètres, mais boutons en haut à droite
+                footer.innerHTML = '';
+                headerAuth.innerHTML = `
+                    <a href="./register/" class="btn-header btn-register">Inscription</a>
+                    <a href="./login/" class="btn-header btn-login">Connexion</a>
+                `;
             }
         });
-
-        // --- INTERFACE ---
-        // Menu Push (sans overlay)
-        document.getElementById('menuBtn').onclick = () => { 
-            document.getElementById('sidebar').classList.toggle('active'); 
-        };
 
         // --- RECHERCHE (CLIC DROIT) ---
         const searchOverlay = document.getElementById('searchOverlay');
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
 
-        // Afficher au clic droit
         document.addEventListener('contextmenu', (e) => {
-            e.preventDefault(); // Annule le menu Windows/Mac classique
+            e.preventDefault();
             searchOverlay.classList.add('active');
             searchInput.focus();
             searchInput.value = '';
             searchResults.innerHTML = '';
         });
 
-        // Fermer la recherche si on clique en dehors de la boite ou si on appuie sur Echap
         searchOverlay.onclick = () => searchOverlay.classList.remove('active');
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') searchOverlay.classList.remove('active');
         });
 
-        // Filtrer les Tchits en direct
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
             searchResults.innerHTML = '';
-            
-            if (query === '') return; // Ne rien afficher si vide
+            if (query === '') return; 
 
             const filtres = tousLesTchits.filter(t => t.text.toLowerCase().includes(query));
             
@@ -230,7 +252,7 @@
             filtres.forEach(t => {
                 const item = document.createElement('a');
                 item.className = 'chat-item';
-                item.style.background = "var(--bg)"; // Pour le différencier de la modal
+                item.style.background = "var(--bg)";
                 item.href = `./chat/?id=${t.id}`;
                 item.innerText = t.text;
                 searchResults.appendChild(item);
