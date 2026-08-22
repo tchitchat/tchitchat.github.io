@@ -30,19 +30,10 @@
         /* Main Content */
         .main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100%; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        /* Header modifié pour accueillir les boutons à droite */
         header { padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
         .menu-toggle { width: 40px; cursor: pointer; height: 40px; display: flex; align-items: center; border-radius: 50%; padding: 8px; transition: background 0.2s;}
         .menu-toggle:hover { background: var(--border); }
         .menu-toggle img { width: 24px; }
-
-        /* Boutons header (Top Right) */
-        .header-auth-container { display: flex; gap: 10px; }
-        .btn-header { padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: 0.2s; }
-        .btn-login { background: transparent; color: var(--text); border: 1px solid var(--border); }
-        .btn-login:hover { background: var(--border); }
-        .btn-register { background: #4285f4; color: white; border: 1px solid #4285f4; }
-        .btn-register:hover { background: #3367d6; }
 
         .chat-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .gradient-text { background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: clamp(32px, 8vw, 48px); font-weight: bold; }
@@ -60,11 +51,18 @@
         .send-btn:active { transform: scale(0.9); }
         .send-btn img { width: 28px; }
 
-        /* Sidebar Footer (Paramètres) */
-        .sidebar-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border); }
+        /* Sidebar Footer (Paramètres & Auth) */
+        .sidebar-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+        
         .btn-settings { width: 100%; padding: 10px 12px; background: transparent; border: none; color: var(--text); border-radius: 8px; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; transition: background 0.2s; }
         .btn-settings:hover { background: var(--border); }
         .btn-settings img { width: 18px; margin-right: 10px; opacity: 0.7; }
+        
+        .btn-auth-menu { display: block; text-align: center; padding: 10px; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 14px; transition: 0.2s; }
+        .btn-auth-login { background: transparent; color: var(--text); border: 1px solid var(--border); }
+        .btn-auth-login:hover { background: var(--border); }
+        .btn-auth-signup { background: #4285f4; color: white; }
+        .btn-auth-signup:hover { background: #3367d6; }
 
         /* Modal de Recherche (Clic droit) */
         .search-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); z-index: 9999; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.2s; }
@@ -85,16 +83,13 @@
         <div class="history-label">Vos Tchits</div>
         <div id="chatList"></div>
         <div class="sidebar-footer" id="sidebarFooter">
-            <!-- Injecté par JS : Bouton Paramètres -->
+            <!-- Injecté par JS (Paramètres ou Auth) -->
         </div>
     </aside>
 
     <main class="main-content">
         <header>
             <div class="menu-toggle" id="menuBtn"><img src="menu.png" alt="Menu"></div>
-            <div class="header-auth-container" id="headerAuth">
-                <!-- Injecté par JS : Boutons Inscription/Connexion -->
-            </div>
         </header>
         <div class="chat-area">
             <h1 class="gradient-text">Bienvenue</h1>
@@ -141,12 +136,10 @@
         const sidebar = document.getElementById('sidebar');
         const menuBtn = document.getElementById('menuBtn');
 
-        // Au chargement, on vérifie l'état sauvegardé
         if (localStorage.getItem('sidebarOpen') === 'true') {
             sidebar.classList.add('active');
         }
 
-        // Au clic, on toggle et on sauvegarde le nouvel état
         menuBtn.onclick = () => { 
             sidebar.classList.toggle('active'); 
             localStorage.setItem('sidebarOpen', sidebar.classList.contains('active'));
@@ -193,28 +186,21 @@
             }
         });
 
-        // --- AUTH & GESTION DES BOUTONS (HEADER ET FOOTER) ---
+        // --- AUTH & GESTION DU FOOTER MENU ---
         onAuthStateChanged(auth, (user) => {
             const footer = document.getElementById('sidebarFooter');
-            const headerAuth = document.getElementById('headerAuth');
 
             if (user) {
-                // Connecté : Bouton paramètres dans le sidebar
                 footer.innerHTML = `
                     <a href="./account/" class="btn-settings">
                         <img src="settings.png" alt="⚙️"> Paramètres
                     </a>
                 `;
-                // On vide le conteneur en haut à droite
-                headerAuth.innerHTML = ''; 
-                
                 loadHistory(user);
             } else {
-                // Déconnecté : Pas de paramètres, mais boutons en haut à droite
-                footer.innerHTML = '';
-                headerAuth.innerHTML = `
-                    <a href="./register/" class="btn-header btn-register">Inscription</a>
-                    <a href="./login/" class="btn-header btn-login">Connexion</a>
+                footer.innerHTML = `
+                    <a href="./signup/" class="btn-auth-menu btn-auth-signup">Inscription</a>
+                    <a href="./login/" class="btn-auth-menu btn-auth-login">Connexion</a>
                 `;
             }
         });
