@@ -8,10 +8,10 @@
     <style>
         :root { --bg: #f8fbff; --card-bg: white; --text: #1f1f1f; --border: #dce1e7; }
         [data-theme="dark"] { --bg: #131314; --card-bg: #1e1e20; --text: #e3e3e3; --border: #444746; }
-        
+
         * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.3s, color 0.3s; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100dvh; }
-        
+
         .auth-card { 
             background: var(--card-bg); 
             padding: 40px 30px; 
@@ -25,7 +25,7 @@
 
         .logo-img { width: 60px; height: 60px; margin-bottom: 15px; border-radius: 12px; }
         h1 { margin-bottom: 25px; font-size: 24px; font-weight: 600; }
-        
+
         .btn-google {
             width: 100%;
             padding: 12px;
@@ -81,9 +81,9 @@
     <div class="auth-card">
         <img src="../logo.png" alt="TchitChat Logo" class="logo-img">
         <h1 id="txtTitle">Login</h1>
-        
+
         <button id="googleBtn" class="btn-google">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
             <span id="txtGoogle">Continue with Google</span>
         </button>
 
@@ -91,9 +91,9 @@
 
         <input type="email" id="email" placeholder="Email">
         <input type="password" id="password" placeholder="Password">
-        
+
         <button class="btn-primary" id="loginBtn">Login</button>
-        
+
         <p class="footer-link">
             <span id="txtNoAccount">No account?</span> 
             <a href="../signup/" id="txtLink">Sign Up</a>
@@ -107,10 +107,11 @@
         const firebaseConfig = { apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", authDomain: "tchitchat-ia.firebaseapp.com", projectId: "tchitchat-ia", storageBucket: "tchitchat-ia.firebasestorage.app", messagingSenderId: "784697397736", appId: "1:784697397736:web:55295804d84feafda7945d" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
 
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
         const lang = localStorage.getItem('lang') || (navigator.language.startsWith('fr') ? 'fr' : 'en');
-        
+
         if(lang === 'fr') {
             document.getElementById('txtTitle').innerText = "Connexion";
             document.getElementById('txtGoogle').innerText = "Continuer avec Google";
@@ -120,11 +121,31 @@
             document.getElementById('txtLink').innerText = "S'inscrire";
         }
 
-        document.getElementById('googleBtn').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).then(() => window.location.href="../");
+        // --- GESTION CONNEXION GOOGLE (SKETCHWARE / WEB) ---
+        async function auClicSurBoutonGoogle() {
+            if (typeof AndroidBridge !== "undefined") {
+                // Déclenche la connexion native Android dans l'application
+                AndroidBridge.declencherConnexionGoogle();
+            } else {
+                // Déclenche la connexion popup Firebase classique sur le Web
+                try {
+                    await signInWithPopup(auth, provider);
+                    window.location.href = "../";
+                } catch (err) {
+                    alert(err.message);
+                }
+            }
+        }
+
+        document.getElementById('googleBtn').onclick = auClicSurBoutonGoogle;
+
+        // --- GESTION CONNEXION EMAIL/MOT DE PASSE ---
         document.getElementById('loginBtn').onclick = () => {
             const e = document.getElementById('email').value;
             const p = document.getElementById('password').value;
-            signInWithEmailAndPassword(auth, e, p).then(() => window.location.href="../").catch(err => alert(err.message));
+            signInWithEmailAndPassword(auth, e, p)
+                .then(() => window.location.href = "../")
+                .catch(err => alert(err.message));
         };
     </script>
 </body>
