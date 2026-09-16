@@ -25,7 +25,7 @@
 
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); display: flex; height: 100dvh; overflow: hidden; width: 100vw; }
 
-        /* Overlay foncé pour le menu */
+        /* Overlay foncé pour l'application / mobile */
         .menu-overlay {
             position: fixed;
             top: 0;
@@ -33,7 +33,7 @@
             width: 100vw;
             height: 100vh;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 999; /* Juste en dessous de la sidebar (1000) */
+            z-index: 999;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -43,9 +43,35 @@
             visibility: visible;
         }
 
-        /* Sidebar */
-        .sidebar { flex: 0 0 280px; margin-left: -280px; height: 100%; background-color: var(--bg); z-index: 1000; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 20px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        /* Sidebar Base */
+        .sidebar { 
+            flex: 0 0 280px; 
+            margin-left: -280px; 
+            height: 100%; 
+            background-color: var(--bg); 
+            z-index: 1000; 
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            padding: 20px; 
+            border-right: 1px solid var(--border); 
+            display: flex; 
+            flex-direction: column; 
+        }
         .sidebar.active { margin-left: 0; }
+
+        /* Sur Web Desktop : l'overlay sombre n'apparaît pas */
+        @media (min-width: 769px) {
+            body:not(.is-app) .menu-overlay {
+                display: none !important;
+            }
+        }
+
+        /* Dans l'application : la sidebar survole l'écran en position fixe */
+        body.is-app .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+        }
 
         .sidebar-brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: bold; margin-bottom: 20px; }
         .brand-logo { width: 32px; height: 32px; border-radius: 6px; }
@@ -106,7 +132,6 @@
     </style>
 </head>
 <body>
-    <!-- Overlay foncé cliquable -->
     <div class="menu-overlay" id="menuOverlay"></div>
 
     <aside class="sidebar" id="sidebar">
@@ -117,9 +142,7 @@
         <a href="./" class="btn-new-chat">+ Nouveau Tchit</a>
         <div class="history-label">Vos Tchits</div>
         <div id="chatList"></div>
-        <div class="sidebar-footer" id="sidebarFooter">
-            <!-- Injecté par JS -->
-        </div>
+        <div class="sidebar-footer" id="sidebarFooter"></div>
     </aside>
 
     <main class="main-content">
@@ -138,7 +161,6 @@
         </div>
     </main>
 
-    <!-- Popup de recherche -->
     <div class="search-overlay" id="searchOverlay">
         <div class="search-modal" onclick="event.stopPropagation()">
             <input type="text" id="searchInput" placeholder="Rechercher un Tchit...">
@@ -148,7 +170,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithCredential, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
         const firebaseConfig = { 
@@ -167,32 +189,64 @@
 
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
 
-        // --- GESTION DU MENU (SANS SAUVEGARDE) ---
+        // --- DÉTECTION USERAGENT APPLICATION ---
+        const isApp = navigator.userAgent.includes('TchitChatApp') || typeof AndroidBridge !== "undefined";
+        if (isApp) {
+            document.body.classList.add('is-app');
+        }
+
+        // --- GESTION DU MENU (WEB PERSISTANT VS APP DRAWER) ---
         const sidebar = document.getElementById('sidebar');
         const menuBtn = document.getElementById('menuBtn');
         const menuOverlay = document.getElementById('menuOverlay');
 
-        // Fonction pour fermer le menu
-        function closeMenu() {
-            sidebar.classList.remove('active');
-            menuOverlay.classList.remove('active');
+        // Restauration de l'état du menu sur le Web au rafraîchissement
+        if (!isApp) {
+            const savedState = localStorage.getItem('sidebarState');
+            if (savedState === 'open' || savedState === null) {
+                sidebar.classList.add('active');
+            }
         }
 
-        // Fonction pour ouvrir/fermer au clic du bouton burger
-        menuBtn.onclick = () => { 
-            sidebar.classList.toggle('active');
-            menuOverlay.classList.toggle('active');
-        };
+        function toggleMenu() {
+            const isOpen = sidebar.classList.contains('active');
 
-        // Fermer le menu au clic sur le fond sombre (overlay)
-        menuOverlay.onclick = closeMenu;
-
-        // Fermer le menu au clic sur n'importe quel bouton/lien à l'intérieur de la sidebar
-        sidebar.addEventListener('click', (e) => {
-            if (e.target.closest('a') || e.target.closest('button')) {
-                closeMenu();
+            if (isOpen) {
+                sidebar.classList.remove('active');
+                menuOverlay.classList.remove('active');
+                if (!isApp) localStorage.setItem('sidebarState', 'closed');
+            } else {
+                sidebar.classList.add('active');
+                if (isApp) menuOverlay.classList.add('active');
+                if (!isApp) localStorage.setItem('sidebarState', 'open');
             }
-        });
+        }
+
+        menuBtn.onclick = toggleMenu;
+
+        // Comportement de fermeture automatique pour l'application mobile
+        if (isApp) {
+            menuOverlay.onclick = () => {
+                sidebar.classList.remove('active');
+                menuOverlay.classList.remove('active');
+            };
+
+            sidebar.addEventListener('click', (e) => {
+                if (e.target.closest('a') || e.target.closest('button')) {
+                    sidebar.classList.remove('active');
+                    menuOverlay.classList.remove('active');
+                }
+            });
+        }
+
+        // --- VALIDER CONNEXION GOOGLE DEPUIS ANDROID ---
+        window.validerConnexionGoogleAndroid = function(email, token) {
+            if (token) {
+                const credential = GoogleAuthProvider.credential(token);
+                signInWithCredential(auth, credential)
+                    .catch(err => console.error("Erreur auth Android :", err));
+            }
+        };
 
         // --- CHARGEMENT HISTORIQUE ---
         function loadHistory(user) {
