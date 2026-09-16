@@ -122,14 +122,13 @@
         }
 
         // --- RAPPEL EXÉCUTÉ DEPUIS L'APPLICATION ANDROID (SKETCHWARE) ---
-        window.validerConnexionGoogleAndroid = function(tokenRecu) {
-            // Votre site envoie ce jeton à votre serveur (PHP / Firebase)
-            // Votre serveur valide le token auprès de Google pour connecter l'utilisateur à 100% de manière sécurisée
-            console.log("Jeton officiel Android reçu : " + tokenRecu);
-
-            // Connexion automatique Firebase avec le jeton Android
-            if (tokenRecu) {
-                const credential = GoogleAuthProvider.credential(tokenRecu);
+        window.validerConnexionGoogleAndroid = function(email, token) {
+            console.log("Compte choisi : " + email);
+            console.log("Token de sécurité officiel Google : " + token);
+            
+            if (token) {
+                // Connexion automatique Firebase Auth via le jeton Android
+                const credential = GoogleAuthProvider.credential(token);
                 signInWithCredential(auth, credential)
                     .then(() => {
                         window.location.href = "../";
