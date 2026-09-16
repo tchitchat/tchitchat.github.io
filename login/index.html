@@ -102,7 +102,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", authDomain: "tchitchat-ia.firebaseapp.com", projectId: "tchitchat-ia", storageBucket: "tchitchat-ia.firebasestorage.app", messagingSenderId: "784697397736", appId: "1:784697397736:web:55295804d84feafda7945d" };
         const app = initializeApp(firebaseConfig);
@@ -122,12 +122,22 @@
         }
 
         // --- RAPPEL EXÉCUTÉ DEPUIS L'APPLICATION ANDROID (SKETCHWARE) ---
-        window.connexionDepuisApplication = function(emailRecu) {
-            alert("Application connectée avec le compte : " + emailRecu);
-            
-            // Pré-remplit automatiquement le champ e-mail
-            if (emailRecu) {
-                document.getElementById('email').value = emailRecu;
+        window.validerConnexionGoogleAndroid = function(tokenRecu) {
+            // Votre site envoie ce jeton à votre serveur (PHP / Firebase)
+            // Votre serveur valide le token auprès de Google pour connecter l'utilisateur à 100% de manière sécurisée
+            console.log("Jeton officiel Android reçu : " + tokenRecu);
+
+            // Connexion automatique Firebase avec le jeton Android
+            if (tokenRecu) {
+                const credential = GoogleAuthProvider.credential(tokenRecu);
+                signInWithCredential(auth, credential)
+                    .then(() => {
+                        window.location.href = "../";
+                    })
+                    .catch((err) => {
+                        console.error("Erreur d'authentification Firebase :", err);
+                        alert("Erreur de connexion : " + err.message);
+                    });
             }
         };
 
