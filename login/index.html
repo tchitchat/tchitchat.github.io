@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -25,26 +25,6 @@
 
         .logo-img { width: 60px; height: 60px; margin-bottom: 15px; border-radius: 12px; }
         h1 { margin-bottom: 25px; font-size: 24px; font-weight: 600; }
-
-        .btn-google {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: var(--card-bg);
-            color: var(--text);
-            cursor: pointer;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-size: 15px;
-        }
-
-        .divider { margin: 20px 0; display: flex; align-items: center; color: #70757a; font-size: 13px; }
-        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); margin: 0 10px; }
 
         input { 
             width: 100%; 
@@ -82,8 +62,6 @@
         <img src="../logo.png" alt="TchitChat Logo" class="logo-img">
         <h1 id="txtTitle">Login</h1>
 
-        <div class="divider" id="txtDivider">or</div>
-
         <input type="email" id="email" placeholder="Email">
         <input type="password" id="password" placeholder="Password">
 
@@ -97,61 +75,22 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDU4105kXewXvvBlxkfH8MJNe6x0FQSB4o", authDomain: "tchitchat-ia.firebaseapp.com", projectId: "tchitchat-ia", storageBucket: "tchitchat-ia.firebasestorage.app", messagingSenderId: "784697397736", appId: "1:784697397736:web:55295804d84feafda7945d" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
 
+        // Appliquer le thème et la langue du navigateur / localStorage
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
         const lang = localStorage.getItem('lang') || (navigator.language.startsWith('fr') ? 'fr' : 'en');
 
         if(lang === 'fr') {
             document.getElementById('txtTitle').innerText = "Connexion";
-            document.getElementById('txtGoogle').innerText = "Continuer avec Google";
-            document.getElementById('txtDivider').innerText = "ou";
             document.getElementById('loginBtn').innerText = "Se connecter";
             document.getElementById('txtNoAccount').innerText = "Pas de compte ?";
             document.getElementById('txtLink').innerText = "S'inscrire";
         }
-
-        // --- RAPPEL EXÉCUTÉ DEPUIS L'APPLICATION ANDROID (SKETCHWARE) ---
-        window.validerConnexionGoogleAndroid = function(email, token) {
-            console.log("Compte choisi : " + email);
-            console.log("Token de sécurité officiel Google : " + token);
-            
-            if (token) {
-                // Connexion automatique Firebase Auth via le jeton Android
-                const credential = GoogleAuthProvider.credential(token);
-                signInWithCredential(auth, credential)
-                    .then(() => {
-                        window.location.href = "../";
-                    })
-                    .catch((err) => {
-                        console.error("Erreur d'authentification Firebase :", err);
-                        alert("Erreur de connexion : " + err.message);
-                    });
-            }
-        };
-
-        // --- GESTION CONNEXION GOOGLE (SKETCHWARE / WEB) ---
-        async function auClicSurBoutonGoogle() {
-            if (typeof AndroidBridge !== "undefined") {
-                // Déclenche la connexion native Android dans l'application
-                AndroidBridge.declencherConnexionGoogle();
-            } else {
-                // Déclenche la connexion popup Firebase classique sur le Web
-                try {
-                    await signInWithPopup(auth, provider);
-                    window.location.href = "../";
-                } catch (err) {
-                    alert(err.message);
-                }
-            }
-        }
-
-        document.getElementById('googleBtn').onclick = auClicSurBoutonGoogle;
 
         // --- GESTION CONNEXION EMAIL/MOT DE PASSE ---
         document.getElementById('loginBtn').onclick = () => {
