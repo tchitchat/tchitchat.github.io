@@ -6,8 +6,49 @@
     <title>TchitChat</title>
     <link rel="icon" type="image/x-icon" href="tchitchat.ico">
     <style>
-        :root { --bg: #f8fbff; --card-bg: white; --text: #1f1f1f; --border: #e1e4e8; }
-        [data-theme="dark"] { --bg: #131314; --card-bg: #1e1e20; --text: #e3e3e3; --border: #444746; }
+        :root { 
+            --bg: #f8fbff; 
+            --card-bg: white; 
+            --text: #1f1f1f; 
+            --border: #e1e4e8; 
+            --accent: #4285f4; 
+            --accent-hover: #3367d6;
+        }
+        [data-theme="dark"] { 
+            --bg: #131314; 
+            --card-bg: #1e1e20; 
+            --text: #e3e3e3; 
+            --border: #444746; 
+        }
+
+        /* --- STYLES INTERFACE PERSONNALISÉE (DÉTECTION SKETCHWARE / USER-AGENT) --- */
+        body.app-mode { 
+            --accent: #8e24aa; 
+            --accent-hover: #7b1fa2;
+        }
+        body.app-mode .brand-text { 
+            background: linear-gradient(90deg, #8e24aa, #ff4081); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+        body.app-mode .gradient-text { 
+            background: linear-gradient(90deg, #8e24aa, #ff4081, #ff6e40); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+        .app-badge { 
+            display: none; 
+            padding: 2px 8px; 
+            background: rgba(142, 36, 170, 0.15); 
+            color: #8e24aa; 
+            border-radius: 6px; 
+            font-size: 11px; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            margin-left: 6px;
+        }
+        body.app-mode .app-badge { display: inline-block; }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); display: flex; height: 100dvh; overflow: hidden; width: 100vw; }
@@ -20,7 +61,8 @@
         .brand-logo { width: 32px; height: 32px; border-radius: 6px; }
         .brand-text { background: linear-gradient(90deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .btn-new-chat { background-color: #4285f4; color: white !important; border: none; border-radius: 12px; padding: 12px; width: 100%; margin-bottom: 15px; cursor: pointer; font-weight: 600; text-align: center; text-decoration: none; display: block; }
+        .btn-new-chat { background-color: var(--accent); color: white !important; border: none; border-radius: 12px; padding: 12px; width: 100%; margin-bottom: 15px; cursor: pointer; font-weight: 600; text-align: center; text-decoration: none; display: block; transition: background 0.2s; }
+        .btn-new-chat:hover { background-color: var(--accent-hover); }
 
         .history-label { font-size: 12px; font-weight: bold; color: #70757a; margin: 10px 0; text-transform: uppercase; }
         #chatList { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; }
@@ -42,7 +84,7 @@
         /* Zone de saisie extensible */
         .bottom-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 10px 15px 30px 15px; } 
         .input-box { background: var(--card-bg); border-radius: 28px; display: flex; align-items: flex-end; padding: 8px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border: 1px solid var(--border); transition: all 0.3s ease; }
-        .input-box:focus-within { border-radius: 16px; padding-bottom: 12px; border-color: #4285f4; }
+        .input-box:focus-within { border-radius: 16px; padding-bottom: 12px; border-color: var(--accent); }
         
         .input-box textarea { flex: 1; border: none; outline: none; font-size: 16px; padding: 8px 0; background: transparent; color: var(--text); resize: none; height: 40px; min-height: 40px; transition: height 0.3s ease; font-family: inherit; line-height: 1.5; }
         .input-box:focus-within textarea { height: 120px; }
@@ -61,15 +103,15 @@
         .btn-auth-menu { display: block; text-align: center; padding: 10px; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 14px; transition: 0.2s; }
         .btn-auth-login { background: transparent; color: var(--text); border: 1px solid var(--border); }
         .btn-auth-login:hover { background: var(--border); }
-        .btn-auth-signup { background: #4285f4; color: white; }
-        .btn-auth-signup:hover { background: #3367d6; }
+        .btn-auth-signup { background: var(--accent); color: white; }
+        .btn-auth-signup:hover { background: var(--accent-hover); }
 
         /* Modal de Recherche (Clic droit) */
         .search-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); z-index: 9999; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.2s; }
         .search-overlay.active { display: flex; opacity: 1; }
         .search-modal { background: var(--card-bg); width: 500px; max-width: 90%; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 20px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px; }
         .search-modal input { width: 100%; padding: 14px 18px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 16px; outline: none; transition: border 0.2s; }
-        .search-modal input:focus { border-color: #4285f4; }
+        .search-modal input:focus { border-color: var(--accent); }
         #searchResults { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; }
     </style>
 </head>
@@ -78,12 +120,13 @@
         <div class="sidebar-brand">
             <img src="logo.png" class="brand-logo" alt="Logo">
             <span class="brand-text">TchitChat</span>
+            <span class="app-badge">App Pro</span>
         </div>
         <a href="./" class="btn-new-chat">+ Nouveau Tchit</a>
         <div class="history-label">Vos Tchits</div>
         <div id="chatList"></div>
         <div class="sidebar-footer" id="sidebarFooter">
-            <!-- Injecté par JS (Paramètres ou Auth) -->
+            <!-- Injecté par JS -->
         </div>
     </aside>
 
@@ -129,6 +172,13 @@
         const db = getFirestore(app);
 
         let tousLesTchits = [];
+
+        // --- DÉTECTION USER-AGENT POUR INTERFACE PERSONNALISÉE ---
+        // Remplace "TchitChatApp" par la chaîne configurée dans le UserAgent de Sketchware Pro
+        const CUSTOM_APP_SIGNATURE = "TchitChatApp"; 
+        if (navigator.userAgent.includes(CUSTOM_APP_SIGNATURE)) {
+            document.body.classList.add('app-mode');
+        }
 
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
 
