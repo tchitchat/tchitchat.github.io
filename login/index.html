@@ -121,6 +121,16 @@
             document.getElementById('txtLink').innerText = "S'inscrire";
         }
 
+        // --- RAPPEL EXÉCUTÉ DEPUIS L'APPLICATION ANDROID (SKETCHWARE) ---
+        window.connexionDepuisApplication = function(emailRecu) {
+            alert("Application connectée avec le compte : " + emailRecu);
+            
+            // Pré-remplit automatiquement le champ e-mail
+            if (emailRecu) {
+                document.getElementById('email').value = emailRecu;
+            }
+        };
+
         // --- GESTION CONNEXION GOOGLE (SKETCHWARE / WEB) ---
         async function auClicSurBoutonGoogle() {
             if (typeof AndroidBridge !== "undefined") {
